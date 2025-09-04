@@ -1,8 +1,7 @@
-@fermions f
-singlet = 1/ √2 * (f[1, :↑]' * f[2, :↓]' - f[1, :↓]' * f[2, :↑]')
-triplet_0 = 1/ √2 * (f[1, :↑]' * f[2, :↓]' + f[1, :↓]' * f[2, :↑]')
-triplet_plus = 1/√2  *((f[1, :↑]' * f[2, :↑]' + f[1, :↓]' * f[2, :↓]'))
-triplet_minus = 1/√2 *((f[1, :↑]' * f[2, :↑]' - f[1, :↓]' * f[2, :↓]'))
+singlet(f) = 1/ √2 * (f[1, :↑]' * f[2, :↓]' - f[1, :↓]' * f[2, :↑]')
+triplet_0(f) = 1/ √2 * (f[1, :↑]' * f[2, :↓]' + f[1, :↓]' * f[2, :↑]')
+triplet_plus(f) = 1/√2  *((f[1, :↑]' * f[2, :↑]' + f[1, :↓]' * f[2, :↓]'))
+triplet_minus(f) = 1/√2 *((f[1, :↑]' * f[2, :↑]' - f[1, :↓]' * f[2, :↓]'))
 
 
 function vac_state(H)
@@ -11,7 +10,7 @@ function vac_state(H)
     return v0
 end
 
-function def_state(state_name, H)
+function def_state(f, state_name, H)
     v0 = vac_state(H)
     v = matrix_representation(state_name, H) * v0
     ρ = v*v'

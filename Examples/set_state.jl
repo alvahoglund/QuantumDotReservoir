@@ -27,7 +27,7 @@ ham = hamiltonian(H_total, f)
 ham = matrix_representation(ham, H_total)
 
 ## Main system state
-ρ_main = def_state(triplet_minus, H_main)
+ρ_main = def_state(f, triplet_minus, H_main)
 #ham_main = partial_trace(ham, H_total => H_main)
 #ρ_main = ground_state(ham_main, H_main, qn_main)
 i_sub = sector_index(qn_main, H_main)
