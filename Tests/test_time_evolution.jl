@@ -24,7 +24,7 @@ end
     H1 = hilbert_space(labels([1,2]))
     H2 = hilbert_space(labels([2,3]))
     H12 = hilbert_space(labels([1,2,3]))
-    ham = matrix_representation(hamiltonian(H12, f), H12)
+    ham = matrix_representation(hamiltonian(hamiltonian_so_b, H12, f), H12)
 
     ham1 = partial_trace(ham, H12 => H1)
     ρ1 = ground_state(ham1)
