@@ -1,5 +1,3 @@
-using LinearAlgebra, FermionicHilbertSpaces
-    
 labels(sites) = [(site, spin) for site in sites for spin in (:↑, :↓)]
 sites(H) = unique(first.(keys(H)))
 
