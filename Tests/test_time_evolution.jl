@@ -14,7 +14,7 @@
     op_t = operator_time_evolution(op, t, ham)
     exp_value_op = expectation_value(ρ,op_t)
 
-    @test exp_value_op≈ exp_value_op
+    @test exp_value_op≈ exp_value_ρ
 end
 
 
