@@ -36,7 +36,7 @@ end
     ρ12 = tensor_product((ρ1, ρ2), (H1, H2)=> H12)
     exp_value = expectation_value(ρ12, op)
 
-    op_eff = effective_meaurement(op, ρ2, H1, H2, H12)
+    op_eff = effective_measurement(op, ρ2, H1, H2, H12)
     exp_value_eff = expectation_value(ρ1, op_eff)
     @test exp_value ≈ exp_value_eff
 end

@@ -27,7 +27,10 @@ end
 function ground_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) where T
     index_qn = sector_index(qn, H)
     ham_qn = ham[index_qn, index_qn]
-    state = zeros(T, dim(H), dim(H))
+    state = spzeros(T, dim(H), dim(H))
     state[index_qn, index_qn] = ground_state(ham_qn)
     return state
 end
+
+reservoir_ground_state(qd_system :: QuantumDotSystem, ham) = 
+    ground_state(partial_trace(ham, qd_system.H_total => qd_system.H_reservoir), qd_system.H_reservoir, qd_system.qn_reservoir)
