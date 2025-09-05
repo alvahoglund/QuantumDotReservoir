@@ -12,7 +12,7 @@ end
 
 function def_state(f, state_name, H)
     v0 = vac_state(H)
-    v = matrix_representation(state_name, H) * v0
+    v = matrix_representation(state_name(f), H) * v0
     ρ = v*v'
     ρ = ρ / norm(ρ)
     return ρ
