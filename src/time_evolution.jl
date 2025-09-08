@@ -5,7 +5,7 @@ function propagator(t, hamiltonian, qn, H)
     index = sector_index(qn, H)
     hamiltonian_sub = hamiltonian[index, index]
     propagator_sub = propagator(t, hamiltonian_sub)
-    propagator_padded = zeros(Complex{Float64}, dim(H), dim(H))
+    propagator_padded = spzeros(Complex{Float64}, dim(H), dim(H))
     propagator_padded[index,index] = propagator_sub
     return propagator_padded
 end
