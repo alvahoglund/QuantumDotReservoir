@@ -13,7 +13,7 @@ end
 
 operator_time_evolution(propagator, operator) = propagator' * operator * propagator
 operator_time_evolution(operator, t, hamiltonian) = operator_time_evolution(propagator(t, hamiltonian), operator)
-operator_time_evolution(operator, t, hamiltonian, qn, H) = operator_time_evolution(propagator(t, hamiltonian, qn, H), operator)
+operator_time_evolution(operator, t, hamiltonian, qn, H) = operator_time_evolution(propagator(t, hamiltonian, qn, H), operator) #Only evolve a qn-sector of the operator 
 
 
 state_time_evolution(propagator, ρ) = propagator * ρ * propagator'

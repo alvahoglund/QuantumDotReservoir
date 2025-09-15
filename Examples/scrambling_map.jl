@@ -33,6 +33,7 @@ function s()
         map(i -> matrix_representation(nbr_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total),
         map(i -> matrix_representation(nbr2_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total)
     )
+    t=1.0
     prop = propagator(t, ham, qd_system.qn_total, qd_system.H_total)
     process_measurements = op -> effective_measurement(
         operator_time_evolution(sparse(prop), sparse(op)), ρ_res, qd_system
