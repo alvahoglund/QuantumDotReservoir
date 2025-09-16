@@ -113,3 +113,5 @@ function hamiltonians(hamiltonian_type, H_i, H_j, f)
     ham_tot = ham_i + ham_j + ham_interactions 
     return Hamiltonians(ham_i, ham_j, ham_interactions, ham_tot)
 end
+
+hamiltonians(hamiltonian_type, qd_system :: QuantumDotSystem) = hamiltonians(hamiltonian_type, qd_system.H_main, qd_system.H_reservoir, qd_system.f)

@@ -31,3 +31,6 @@ function ground_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.Abstr
     state[index_qn, index_qn] = ground_state(ham_qn)
     return state
 end
+
+ground_state(ham:: NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) = 
+    ground_state(matrix_representation(ham, H), H, qn)
