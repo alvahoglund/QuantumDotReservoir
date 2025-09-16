@@ -21,22 +21,22 @@ end
 @testitem "Effective measurements" begin
     @fermions f
     Random.seed!(2)
-    H1 = hilbert_space(labels([1,2]))
-    H2 = hilbert_space(labels([2,3]))
-    H12 = hilbert_space(labels([1,2,3]))
-    ham = matrix_representation(hamiltonian(hamiltonian_so_b, H12, f), H12)
+    H_main = hilbert_space(labels([1,2]))
+    H_res = hilbert_space(labels([2,3]))
+    H_tot = hilbert_space(labels([1,2,3]))
+    hams = hamiltonians(hamiltonian_so_b, H_main, H_res, f)
 
-    ham1 = partial_trace(ham, H12 => H1)
+    ham1 = matrix_representation(hams.hamiltonian_main, H_main)
     ρ1 = ground_state(ham1)
-    ham2 = partial_trace(ham, H12 => H2)
+    ham2 = matrix_representation(hams.hamiltonian_reservoir, H_res)
     ρ2 = ground_state(ham2)
     
-    op = matrix_representation(nbr_op(1,f), H12)
+    op = matrix_representation(nbr_op(1,f), H_tot)
     
-    ρ12 = tensor_product((ρ1, ρ2), (H1, H2)=> H12)
+    ρ12 = tensor_product((ρ1, ρ2), (H_main, H_res)=> H_tot)
     exp_value = expectation_value(ρ12, op)
 
-    op_eff = effective_measurement(op, ρ2, H1, H2, H12)
+    op_eff = effective_measurement(op, ρ2, H_main, H_res, H_tot)
     exp_value_eff = expectation_value(ρ1, op_eff)
     @test exp_value ≈ exp_value_eff
 end
