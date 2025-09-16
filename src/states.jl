@@ -5,7 +5,7 @@ triplet_minus(f) = 1/√2 *((f[1, :↑]' * f[2, :↑]' - f[1, :↓]' * f[2, :↓
 
 
 function vac_state(H)
-    v0 = zeros(dim(H))
+    v0 = spzeros(dim(H))
     v0[FermionicHilbertSpaces.state_index(FockNumber(0), H)] = 1.0
     return v0
 end
