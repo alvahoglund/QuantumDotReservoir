@@ -2,6 +2,7 @@ struct QuantumDotSystem
     sites_main :: Vector{Int}
     sites_reservoir :: Vector{Int}
     sites_total :: Vector{Int}
+    qn_main :: Int
     qn_reservoir :: Int
     qn_total :: Int
 
@@ -26,7 +27,7 @@ function quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 
     @fermions f
 
-    return QuantumDotSystem(sites_main, sites_reservoir, sites_total, qn_reservoir,qn_total,
+    return QuantumDotSystem(sites_main, sites_reservoir, sites_total, nbr_dots_main, qn_reservoir, qn_total,
                             H_main_qn, H_main, H_reservoir, H_total, f)
 end
 
