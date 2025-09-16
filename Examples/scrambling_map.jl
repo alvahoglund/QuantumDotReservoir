@@ -18,14 +18,11 @@ qn_reservoir = 1
 qd_system = quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 
 ## Hamiltonian
-ham = matrix_representation(hamiltonian(qd_system.H_total, qd_system.f), qd_system.H_total)
+hams = hamiltonians(hamiltonian_so_b, qd_system)
+ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
 
 ## Reservoir state  
-ρ_res = reservoir_ground_state(qd_system, ham)
-ind = sector_index(qd_system.qn_reservoir, qd_system.H_reservoir) 
-@show ρ_res[ind,ind]
-
-H_total_qn = FermionicHilbertSpaces.sector(qd_system.qn_total, qd_system.H_total)
+ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
 
 ## Measurements 
 function s()
@@ -33,7 +30,8 @@ function s()
         map(i -> matrix_representation(nbr_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total),
         map(i -> matrix_representation(nbr2_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total)
     )
-    prop = propagator(t, ham, qd_system.qn_total, qd_system.H_total)
+    t= 1
+    prop = propagator(t, ham_tot, qd_system.qn_total, qd_system.H_total)
     process_measurements = op -> effective_measurement(
         operator_time_evolution(sparse(prop), sparse(op)), ρ_res, qd_system
     ) 
@@ -43,5 +41,7 @@ function s()
     scrambling_map = vcat([vec(m)' for m in eff_measurements]...)
     return scrambling_map
 end
+
+s()
 
 @profview s()
