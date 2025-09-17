@@ -1,15 +1,3 @@
-using Pkg
-Pkg.activate(pwd())
-Pkg.instantiate()
-using LinearAlgebra, FermionicHilbertSpaces, Revise, Random, Arpack, SparseArrays, Plots, NonCommutativeProducts
-
-includet("..//src//hilbert_space.jl")
-includet("..//src/hamiltonian.jl")
-includet("..//src/states.jl")
-includet("..//src/time_evolution.jl")
-includet("..//src/measurements.jl")
-includet("..///src/quantum_dot_system.jl")
-
 ## Define the system
 nbr_dots_main = 2
 nbr_dots_reservoir = 1
