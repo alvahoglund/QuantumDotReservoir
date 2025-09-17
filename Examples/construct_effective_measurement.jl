@@ -9,7 +9,7 @@ hams = hamiltonians(hamiltonian_so_b, qd_system)
 
 ## Reservoir state  
 ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
-ind = sector_index(qd_system.qn_reservoir, qd_system.H_reservoir)
+ind = FermionicHilbertSpaces.indices(qd_system.qn_reservoir, qd_system.H_reservoir)
 @show ρ_res[ind,ind]
 
 ## Operator

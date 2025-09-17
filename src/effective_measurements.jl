@@ -10,7 +10,7 @@ function effective_measurement(op, ρ_reservoir, H_main_qn, H_reservoir, H_total
         
         #Pad matrix
         ρ_main = zeros(Complex{Float64}, dim(H_main), dim(H_main))
-        index = sector_index(H_main_qn, H_main)
+        index = FermionicHilbertSpaces.indices(H_main_qn, H_main)
         ρ_main[index, index] = ρ_main_qn
         
         return exp_value(ρ_main)

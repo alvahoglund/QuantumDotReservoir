@@ -14,6 +14,9 @@ struct QuantumDotSystem
     f
 end
 
+labels(sites) = [(site, spin) for site in sites for spin in (:↑, :↓)]
+sites(H) = unique(first.(keys(H)))
+
 function quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
     sites_main = collect(1:nbr_dots_main)
     sites_reservoir = collect(nbr_dots_main+1:nbr_dots_main+nbr_dots_res)
@@ -30,5 +33,3 @@ function quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
     return QuantumDotSystem(sites_main, sites_reservoir, sites_total, nbr_dots_main, qn_reservoir, qn_total,
                             H_main_qn, H_main, H_reservoir, H_total, f)
 end
-
-methods(quantum_dot_system)

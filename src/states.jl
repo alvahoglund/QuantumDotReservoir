@@ -25,7 +25,7 @@ function ground_state(hamiltonian :: AbstractMatrix)
 end
 
 function ground_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) where T
-    index_qn = sector_index(qn, H)
+    index_qn = FermionicHilbertSpaces.FermionicHilbertSpaces.indices(qn, H)
     ham_qn = ham[index_qn, index_qn]
     state = spzeros(T, dim(H), dim(H))
     state[index_qn, index_qn] = ground_state(ham_qn)

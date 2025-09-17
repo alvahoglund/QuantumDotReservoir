@@ -1,8 +1,8 @@
 propagator(t, hamiltonian) = cis(-t * Matrix(hamiltonian))
 
 function propagator(t, hamiltonian, qn, H) 
-    #Returns a propagator in H only evolving indices corresponding to the specified qn
-    index = sector_index(qn, H)
+    #Returns a propagator in H only evolving FermionicHilbertSpaces.indices corresponding to the specified qn
+    index = FermionicHilbertSpaces.indices(qn, H)
     hamiltonian_sub = hamiltonian[index, index]
     propagator_sub = propagator(t, hamiltonian_sub)
     propagator_padded = spzeros(Complex{Float64}, dim(H), dim(H))
