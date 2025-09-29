@@ -102,6 +102,9 @@ hamiltonian_dots(dot_params, coordinates, f) =
 hamiltonian_interactions(interaction_params, coordinates, f) = 
     hamiltonian_t(interaction_params.t, coordinates, f) + hamiltonian_so(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter(interaction_params.u_inter, coordinates, f) 
 
+hamiltonian_intersection(interaction_params, coordinates, f) = 
+    hamiltonian_t_x(interaction_params.t, coordinates, f) + hamiltonian_so_x(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter_x(interaction_params.u_inter, coordinates, f) 
+
 function hamiltonian(quantum_dot_system, f)
     dot_params = merge(main_system_dot_param(quantum_dot_system.coordinates_main), randomize_dot_param(quantum_dot_system.sites_reservoir))
     interaction_params = randomize_interaction_param(quantum_dot_system.sites_total)
