@@ -15,6 +15,9 @@ struct Hamiltonians
     hamiltonian_reservoir
     hamiltonian_interaction
     hamiltonian_total
+    dot_params_main
+    dot_params_reservoir
+    interaction_params
 end
 
 ## ============ Singel dot ================
@@ -30,7 +33,6 @@ hamiltonian_b(ϵb, coordinate_labels, f) = sum(
     for (n,σ) ∈ enumerate([:↑, :↓]), label ∈ coordinate_labels;
     init=0
 )
-
 
 hamiltonian_c_intra(u_intra, coordinate_labels, f) = sum(
     u_intra[label]*f[label,:↑]'f[label, :↓]'f[label, :↓]f[label, :↑]
@@ -87,6 +89,7 @@ function main_system_dot_param(coordinates)
     u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
     return DotParams(ϵ, ϵb, u_intra)
 end
+
 function randomize_dot_param(coordinates)
     Random.seed!(1)
     ϵ = Dict(coordinate => rand() for coordinate in coordinates)
@@ -94,6 +97,7 @@ function randomize_dot_param(coordinates)
     u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
     return DotParams(ϵ, ϵb, u_intra)
 end
+
 function randomize_interaction_param(coordinates)
     coupled_coordinates = get_coupled_coordinates(coordinates)
     t = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
@@ -128,5 +132,6 @@ function hamiltonians(quantum_dot_system)
     hamiltonian_reservoir = hamiltonian_dots(dot_params_reservoir, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f)
     hamiltonian_intersection = hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_intersection, quantum_dot_system.f)
     hamiltonian_total = hamiltonian_main + hamiltonian_reservoir + hamiltonian_intersection 
-    return Hamiltonians(hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total)
+    return Hamiltonians(hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total, 
+                        dot_params_main, dot_params_reservoir, interaction_params)
 end
