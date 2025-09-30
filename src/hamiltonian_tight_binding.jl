@@ -69,12 +69,12 @@ hamiltonian_t_y(t, coordinate_labels, f) = sum(
 hamiltonian_so(t_so, coordinate_labels, f) = hamiltonian_so_x(t_so, coordinate_labels, f) + hamiltonian_so_y(t_so, coordinate_labels, f)
 
 hamiltonian_so_x(t_so, coordinate_labels, f) = sum(
-    t_so[(i,j), (i+1, j)]*(-f[(i+1,j), :↑]'f[(i,j),:↓] + f[(i+1,j), :↑]'f[(i,j),:↓]) + hc
+    t_so[(i,j), (i+1, j)]*(-f[(i+1,j), :↑]'f[(i,j),:↓] + f[(i+1,j), :↓]'f[(i,j),:↑]) + hc
     for (i,j) ∈ coordinate_labels if (i+1, j) ∈ coordinate_labels;
     init=0
 )
 hamiltonian_so_y(t_so, coordinate_labels, f) = sum(
-    t_so[(i,j), (i, j+j)]*(im*f[(i,j+1), :↑]'f[(i,j),:↓] + im*f[(i,j+j), :↑]'f[(i,j),:↓]) + hc
+    t_so[(i,j), (i, j+1)]*(im*f[(i,j+1), :↑]'f[(i,j),:↓] + im*f[(i,j+1), :↓]'f[(i,j),:↑]) + hc
     for (i,j) ∈ coordinate_labels if (i, j+1) ∈ coordinate_labels;
     init=0
 )
@@ -128,5 +128,5 @@ function hamiltonians(quantum_dot_system)
     hamiltonian_reservoir = hamiltonian_dots(dot_params_reservoir, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f)
     hamiltonian_intersection = hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_intersection, quantum_dot_system.f)
     hamiltonian_total = hamiltonian_main + hamiltonian_reservoir + hamiltonian_intersection 
-    return hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total
+    return Hamiltonians(hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total)
 end
