@@ -21,22 +21,21 @@ end
 @testitem "Effective measurements" begin
     @fermions f
     Random.seed!(2)
-    H_main = hilbert_space(labels([1,2]))
-    H_res = hilbert_space(labels([2,3]))
-    H_tot = hilbert_space(labels([1,2,3]))
-    hams = hamiltonians(hamiltonian_so_b, H_main, H_res, f)
+    quantum_dot_system = tight_binding_system(2,3,1)
+    hams = hamiltonians(quantum_dot_system)
 
-    ham1 = matrix_representation(hams.hamiltonian_main, H_main)
+    ham1 = matrix_representation(hams[1], quantum_dot_system.H_main)
     ρ1 = ground_state(ham1)
-    ham2 = matrix_representation(hams.hamiltonian_reservoir, H_res)
+    ham2 = matrix_representation(hams[2], quantum_dot_system.H_reservoir)
     ρ2 = ground_state(ham2)
     
-    op = matrix_representation(nbr_op(1,f), H_tot)
+    op = matrix_representation(nbr_op((1,1),quantum_dot_system.f), quantum_dot_system.H_total)
     
-    ρ12 = tensor_product((ρ1, ρ2), (H_main, H_res)=> H_tot)
+    ρ12 = tensor_product((ρ1, ρ2), (quantum_dot_system.H_main, quantum_dot_system.H_reservoir)=> quantum_dot_system.H_total)
     exp_value = expectation_value(ρ12, op)
 
-    op_eff = effective_measurement(op, ρ2, H_main, H_res, H_tot)
+    op_eff = effective_measurement(op, ρ2, quantum_dot_system.H_main, quantum_dot_system.H_reservoir, quantum_dot_system.H_total)
     exp_value_eff = expectation_value(ρ1, op_eff)
     @test exp_value ≈ exp_value_eff
 end
+
