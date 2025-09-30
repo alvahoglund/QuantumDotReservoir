@@ -1,8 +1,8 @@
 nbr_dots_main = 2
 nbr_dots_res = 1
 qn_reservoir = 2
-qd_system = quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
-hams = hamiltonians(hamiltonian_so_b, H_main, H_reservoir, f)
+qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
+hams = hamiltonians(qd_system)
 
 ham_main = matrix_representation(hams.hamiltonian_main, qd_system.H_main)
 ham_res = matrix_representation(hams.hamiltonian_reservoir, qd_system.H_reservoir)

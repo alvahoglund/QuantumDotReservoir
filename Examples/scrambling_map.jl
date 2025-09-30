@@ -2,10 +2,10 @@
 nbr_dots_main = 2
 nbr_dots_res = 4
 qn_reservoir = 1
-qd_system = quantum_dot_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
+qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 
 ## Hamiltonian
-hams = hamiltonians(hamiltonian_so_b, qd_system)
+hams = hamiltonians(qd_system)
 ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
 
 ## Reservoir state  
@@ -14,8 +14,8 @@ ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
 ## Measurements 
 function s()
     measurements = vcat(
-        map(i -> matrix_representation(nbr_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total),
-        map(i -> matrix_representation(nbr2_op(i, qd_system.f), qd_system.H_total), qd_system.sites_total)
+        map(i -> matrix_representation(nbr_op(i, qd_system.f), qd_system.H_total), qd_system.coordinates_total),
+        map(i -> matrix_representation(nbr2_op(i, qd_system.f), qd_system.H_total), qd_system.coordinates_total)
     )
     t= 1
     prop = propagator(t, ham_tot, qd_system.qn_total, qd_system.H_total)
