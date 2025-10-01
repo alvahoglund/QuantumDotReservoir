@@ -35,13 +35,13 @@ function tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 end
 
 function generate_grid(nbr_dots_main::Int, nbr_dots_reservoir::Int)
-    coordinates_main = [(i, 1) for i in 1:nbr_dots_main]
+    coordinates_main = [(1, i) for i in 1:nbr_dots_main]
     coordinates_reservoir = [
-        (mod1(i, nbr_dots_main), div(i - 1, nbr_dots_main) + 2)
+        (div(i - 1, nbr_dots_main) + 2, mod1(i, nbr_dots_main))
         for i in 1:nbr_dots_reservoir 
     ]
     coordinates_total = vcat(coordinates_main, coordinates_reservoir)
-    coordinates_intersection = vcat(coordinates_main, [coordinate for coordinate in coordinates_reservoir if coordinate[2] ==2])
+    coordinates_intersection = vcat(coordinates_main, [coordinate for coordinate in coordinates_reservoir if coordinate[1] ==2])
     return coordinates_main, coordinates_reservoir, coordinates_total, coordinates_intersection
 end
 
