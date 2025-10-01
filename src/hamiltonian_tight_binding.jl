@@ -83,23 +83,23 @@ hamiltonian_so_y(t_so, coordinate_labels, f) = sum(
 
 ## ========= Set Dot Parameters =============
 function main_system_dot_param(coordinates)
-    ϵ = Dict(coordinate => 1 for coordinate in coordinates)
+    ϵ = Dict(coordinate => 0.5 for coordinate in coordinates)
     ϵb = Dict(coordinate => 1 for coordinate in coordinates)
-    u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
+    u_intra = Dict(coordinate => (rand()+10) for coordinate in coordinates)
     return DotParams(ϵ, ϵb, u_intra)
 end
 
 function randomize_dot_param(coordinates)
     ϵ = Dict(coordinate => rand() for coordinate in coordinates)
     ϵb = Dict(coordinate => 1 for coordinate in coordinates)
-    u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
+    u_intra = Dict(coordinate => (rand()+10) for coordinate in coordinates)
     return DotParams(ϵ, ϵb, u_intra)
 end
 
 function randomize_interaction_param(coordinates)
     coupled_coordinates = get_coupled_coordinates(coordinates)
     t = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
-    t_so = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
+    t_so = Dict(coupled_coordinate => rand()*0.1 for coupled_coordinate in coupled_coordinates)
     u_inter = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
     InteractionParams(t,t_so,u_inter)
 end
