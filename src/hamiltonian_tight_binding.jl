@@ -83,7 +83,6 @@ hamiltonian_so_y(t_so, coordinate_labels, f) = sum(
 
 ## ========= Set Dot Parameters =============
 function main_system_dot_param(coordinates)
-    Random.seed!(1)
     ϵ = Dict(coordinate => 1 for coordinate in coordinates)
     ϵb = Dict(coordinate => 1 for coordinate in coordinates)
     u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
@@ -91,7 +90,6 @@ function main_system_dot_param(coordinates)
 end
 
 function randomize_dot_param(coordinates)
-    Random.seed!(1)
     ϵ = Dict(coordinate => rand() for coordinate in coordinates)
     ϵb = Dict(coordinate => 1 for coordinate in coordinates)
     u_intra = Dict(coordinate => (rand()+1)*10 for coordinate in coordinates)
@@ -123,6 +121,10 @@ hamiltonian_interactions(interaction_params, coordinates, f) =
 hamiltonian_interactions_y(interaction_params, coordinates, f) = 
     hamiltonian_t_y(interaction_params.t, coordinates, f) + hamiltonian_so_y(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter_y(interaction_params.u_inter, coordinates, f) 
 
+function hamiltonians(quantum_dot_system, seed)
+    Random.seed!(seed)
+    return hamiltonians(quantum_dot_system)
+end 
 function hamiltonians(quantum_dot_system)
     dot_params_main = main_system_dot_param(quantum_dot_system.coordinates_main)
     dot_params_reservoir = randomize_dot_param(quantum_dot_system.coordinates_reservoir)
