@@ -13,7 +13,7 @@ end
 struct Hamiltonians
     hamiltonian_main
     hamiltonian_reservoir
-    hamiltonian_interaction
+    hamiltonian_intersection
     hamiltonian_total
     dot_params_main
     dot_params_reservoir
@@ -120,8 +120,8 @@ hamiltonian_dots(dot_params, coordinates, f) =
 hamiltonian_interactions(interaction_params, coordinates, f) = 
     hamiltonian_t(interaction_params.t, coordinates, f) + hamiltonian_so(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter(interaction_params.u_inter, coordinates, f) 
 
-hamiltonian_intersection(interaction_params, coordinates, f) = 
-    hamiltonian_t_x(interaction_params.t, coordinates, f) + hamiltonian_so_x(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter_x(interaction_params.u_inter, coordinates, f) 
+hamiltonian_interactions_y(interaction_params, coordinates, f) = 
+    hamiltonian_t_y(interaction_params.t, coordinates, f) + hamiltonian_so_y(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter_y(interaction_params.u_inter, coordinates, f) 
 
 function hamiltonians(quantum_dot_system)
     dot_params_main = main_system_dot_param(quantum_dot_system.coordinates_main)
@@ -130,7 +130,7 @@ function hamiltonians(quantum_dot_system)
 
     hamiltonian_main = hamiltonian_dots(dot_params_main, quantum_dot_system.coordinates_main, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_main, quantum_dot_system.f)
     hamiltonian_reservoir = hamiltonian_dots(dot_params_reservoir, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f)
-    hamiltonian_intersection = hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_intersection, quantum_dot_system.f)
+    hamiltonian_intersection = hamiltonian_interactions_y(interaction_params, quantum_dot_system.coordinates_intersection, quantum_dot_system.f)
     hamiltonian_total = hamiltonian_main + hamiltonian_reservoir + hamiltonian_intersection 
     return Hamiltonians(hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total, 
                         dot_params_main, dot_params_reservoir, interaction_params)
