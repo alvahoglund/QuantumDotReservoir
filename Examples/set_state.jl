@@ -9,7 +9,7 @@ seed = 5
 hams = hamiltonians(qd_system, seed)
 
 ## Main system state
-ρ_main = def_state(qd_system.f, triplet_0, qd_system.H_main)
+ρ_main = def_state(triplet_0, qd_system.H_main, qd_system.f)
 i_sub = FermionicHilbertSpaces.indices(qd_system.qn_main, qd_system.H_main)
 @show ρ_main[i_sub, i_sub]
 
