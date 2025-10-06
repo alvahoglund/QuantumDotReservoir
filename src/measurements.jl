@@ -1,6 +1,7 @@
-sx(i, f) = (f[i, :↓]'*f[i, :↑] + f[i, :↑]'*f[i, :↓])
-sy(i, f) = im*(f[i, :↓]'*f[i, :↑] - f[i, :↑]'*f[i, :↓])
-sz(i, f) = (f[i, :↑]'*f[i, :↑] - f[i, :↓]'*f[i, :↓])
+σ0(i, f) = (f[i, :↑]'*f[i, :↑] + f[i, :↓]'*f[i, :↓])
+σx(i, f) = (f[i, :↓]'*f[i, :↑] + f[i, :↑]'*f[i, :↓])
+σy(i, f) = im*(f[i, :↓]'*f[i, :↑] - f[i, :↑]'*f[i, :↓])
+σz(i, f) = (f[i, :↑]'*f[i, :↑] - f[i, :↓]'*f[i, :↓])
 
 nbr_op(coordinate, f) = f[coordinate, :↑]'*f[coordinate, :↑] + f[coordinate, :↓]'*f[coordinate, :↓]
 nbr2_op(coordinate, f) = f[coordinate, :↑]'*f[coordinate, :↑]*f[coordinate, :↓]'*f[coordinate, :↓]
