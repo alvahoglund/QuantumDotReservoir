@@ -18,3 +18,4 @@ operator_time_evolution(operator, t, hamiltonian, qn, H) = operator_time_evoluti
 
 state_time_evolution(propagator, ρ) = propagator * ρ * propagator'
 state_time_evolution(ρ, t, hamiltonian) = state_time_evolution(propagator(t, hamiltonian), ρ)
+state_time_evolution(ρ, t, hamiltonian, H, qn) = state_time_evolution(propagator(t, hamiltonian, qn, H), ρ)

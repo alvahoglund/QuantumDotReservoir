@@ -1,34 +1,49 @@
 ## Define the system
 nbr_dots_main = 2
-nbr_dots_res = 4
-qn_reservoir = 1
+nbr_dots_res = 6
+qn_reservoir = 0
 qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 
-## Hamiltonian
 hams = hamiltonians(qd_system)
-ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
-
-## Reservoir state  
 ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
 
-## Measurements 
-function s()
-    measurements = vcat(
-        map(i -> matrix_representation(nbr_op(i, qd_system.f), qd_system.H_total), qd_system.coordinates_total),
-        map(i -> matrix_representation(nbr2_op(i, qd_system.f), qd_system.H_total), qd_system.coordinates_total)
-    )
-    t= 1
-    prop = propagator(t, ham_tot, qd_system.qn_total, qd_system.H_total)
-    process_measurements = op -> effective_measurement(
-        operator_time_evolution(sparse(prop), sparse(op)), ρ_res, qd_system
-    ) 
+# Define some different initial states 
+ρ1 = def_state(triplet_minus, qd_system.H_main, qd_system.f)
+ρ2 = random_product_state(qd_system)
 
-    eff_measurements = map(process_measurements, measurements)
+## Time evolove total state
+ρ1_tot = tensor_product((ρ1, ρ_res), (qd_system.H_main, qd_system.H_reservoir) => qd_system.H_total)
+ρ2_tot = tensor_product((ρ2, ρ_res), (qd_system.H_main, qd_system.H_reservoir) => qd_system.H_total)
 
-    scrambling_map = vcat([vec(m)' for m in eff_measurements]...)
-    return scrambling_map
-end
+t=1
+ρ1_tot_t = state_time_evolution(ρ1_tot, t, matrix_representation(hams.hamiltonian_total, qd_system.H_total), 
+                                qd_system.H_total, qd_system.qn_total)
+ρ2_tot_t = state_time_evolution(ρ2_tot, t, matrix_representation(hams.hamiltonian_total, qd_system.H_total), 
+                                qd_system.H_total, qd_system.qn_total)
 
-s()
+#Define the measurement and measure
+measurements =  map(op -> matrix_representation(op, qd_system.H_total), charge_measurements(qd_system))
 
-@profview s()
+measurement_values_1 = map(m->expectation_value(m, ρ1_tot_t), measurements)
+measurement_values_2 = map(m->expectation_value(m, ρ2_tot_t), measurements)
+
+## Scrambling map
+sm = scrambling_map(qd_system, measurements, ρ_res, matrix_representation(hams.hamiltonian_total, qd_system.H_total), t)
+
+## Compare measurement on time evolved states and with scrambling map
+scrambling_map_values1 = Vector(real(sm*vec(ρ1[ind, ind])))
+measurement_values_1 ≈ scrambling_map_values1 # True
+
+scrambling_map_values2 = Vector(real(sm*vec(ρ2[ind, ind])))
+measurement_values_2 ≈ scrambling_map_values2 ## true(?)
+measurement_values_2 .-scrambling_map_values2
+
+## Find recovery map
+rm = inv(sm)
+rm*sm ≈ Matrix(I,16,16)
+
+ρ1_recovered = reshape(rm*measurement_values_1, 4, 4)
+ρ1_recovered ≈ ρ1[ind,ind] # True
+
+ρ2_recovered = reshape(rm*measurement_values_2, 4,4)
+ρ2_recovered ≈ ρ2[ind,ind] # True
