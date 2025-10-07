@@ -5,7 +5,7 @@ function scrambling_map(qd_system :: QuantumDotSystem, measurements, ρ_res, ham
         operator_time_evolution(sparse(prop), sparse(op)), ρ_res, qd_system
     ) 
     eff_measurements = map(process_measurements, measurements)
-    scrambling_map = vcat([vec(m)' for m in eff_measurements]...)
+    scrambling_map = vcat([vec(transpose(m))' for m in eff_measurements]...)
     return scrambling_map
 end
 
