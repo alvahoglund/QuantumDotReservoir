@@ -5,12 +5,13 @@ function scrambling_map(qd_system :: QuantumDotSystem, measurements, ρ_res, ham
         operator_time_evolution(sparse(prop), sparse(op)), ρ_res, qd_system
     ) 
     eff_measurements = map(process_measurements, measurements)
-    scrambling_map = vcat([vec(transpose(m))' for m in eff_measurements]...)
+    scrambling_map = vcat([vec(m)' for m in eff_measurements]...)
     return scrambling_map
 end
 
-function scrambling_map(qd_system, t)    
-    hams = hamiltonians(qd_system)
+
+function scrambling_map(qd_system, t, seed = nothing)    
+    isnothing(seed) ? hams = hamiltonians(qd_system) : hams = hamiltonians(qd_system, seed)
     hamiltonian_total = matrix_representation(hams.hamiltonian_total, qd_system. H_total)
     ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
     measurements = map(op -> matrix_representation(op, qd_system.H_total), charge_measurements(qd_system))
