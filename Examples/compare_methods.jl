@@ -1,6 +1,6 @@
 ## Define the system
 nbr_dots_main = 2
-nbr_dots_res = 4
+nbr_dots_res = 3
 qn_reservoir = 1
 qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 
@@ -8,8 +8,11 @@ hams = hamiltonians(qd_system)
 ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
 
 # Define some different initial states 
-ρ1 = def_state(triplet_minus, qd_system.H_main, qd_system.f)
+ρ1 = def_state(triplet_plus, qd_system.H_main, qd_system.f)
 ρ2 = random_product_state(qd_system)
+
+ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
+ρ1[ind,ind]
 
 ## Time evolove total state
 ρ1_tot = tensor_product((ρ1, ρ_res), (qd_system.H_main, qd_system.H_reservoir) => qd_system.H_total)
@@ -29,8 +32,8 @@ op_eff = effective_measurement(op, ρ_res, qd_system.H_main_qn, qd_system.H_rese
 op_t = operator_time_evolution(op, t, matrix_representation(hams.hamiltonian_total, qd_system.H_total))
 op_t_eff = effective_measurement(op_t, ρ_res, qd_system.H_main_qn, qd_system.H_reservoir, qd_system.H_total)
 
+
 # Calculate expectation value without time evolution
-ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
 
 testd1 = expectation_value(ρ1_tot, op)
 teste1 = expectation_value(ρ1[ind,ind], op_eff)
@@ -51,4 +54,4 @@ testb2 = expectation_value(ρ2_tot_t, op)
 testc2 = expectation_value(ρ2_tot, op_t)
 
 testa1 ≈ testb1 ≈ testc1 # True
-testa2 ≈ testb2 ≈ testc2 # False
+testa2 ≈ testb2 ≈ testc2 # True
