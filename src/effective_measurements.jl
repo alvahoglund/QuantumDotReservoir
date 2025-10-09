@@ -6,7 +6,7 @@ function effective_measurement(op, ρ_reservoir, H_main_qn, H_reservoir, H_total
     exp_value(ρ_m) = tr((tensor_product((ρ_m, ρ_reservoir), (H_main, H_reservoir) => H_total))*op)
     
     function func(ρ_main_qn_vec)
-        ρ_main_qn = reshape(ρ_main_qn_vec, dim(H_main_qn), dim(H_main_qn))
+        ρ_main_qn = reshape(ρ_main_qn_vec, dim(H_main_qn), dim(H_main_qn))'
         
         #Pad matrix
         ρ_main = zeros(Complex{Float64}, dim(H_main), dim(H_main))
