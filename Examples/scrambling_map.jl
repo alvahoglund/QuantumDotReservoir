@@ -1,11 +1,12 @@
 ##############
 nbr_dots_main = 2
-nbr_dots_res = 4
+nbr_dots_res = 6
 qn_reservoir = 0
-qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
+quantum_dot_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 seed = 2
 hams = hamiltonians(quantum_dot_system, seed)
 reservoir_state = ground_state(hams.hamiltonian_reservoir, quantum_dot_system.H_reservoir, quantum_dot_system.qn_reservoir)
+ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
 
 initial_states = [def_state(triplet_plus, quantum_dot_system.H_main, quantum_dot_system.f),
                     def_state(singlet, quantum_dot_system.H_main, quantum_dot_system.f),
@@ -24,6 +25,7 @@ effective_measurements = map(measurement -> effective_measurement(measurement, r
 sm = scrambling_map(quantum_dot_system, measurements, reservoir_state, matrix_representation(hams.hamiltonian_total, quantum_dot_system.H_total), t)
 
 measured_values = map(m -> expectation_value(time_evolved_states[3], m), measurements)
-reshape(inv(sm)*measured_values, 4,4) ≈ initial_states[3][ind,ind]
-
+if nbr_dots_res≥6
+    reshape(inv(sm)*measured_values, 4,4) ≈ initial_states[3][ind,ind]
+end
 ###############
