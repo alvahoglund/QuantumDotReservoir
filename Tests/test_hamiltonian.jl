@@ -1,5 +1,5 @@
 
-@testitem "Hamiltonian of tight binding model" begin
+@testset "Hamiltonian of tight binding model" begin
     qd_system = tight_binding_system(2,3,1)
     hams = hamiltonians(qd_system)
     h_main = matrix_representation(hams.hamiltonian_main, qd_system.H_total)

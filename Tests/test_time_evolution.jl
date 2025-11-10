@@ -1,5 +1,5 @@
 
-@testitem "State and operator evolution" begin 
+@testset "State and operator evolution" begin 
     using FermionicHilbertSpaces, LinearAlgebra,Random
     
     ρ = rand(ComplexF64, 4,4) + hc
@@ -16,7 +16,7 @@
 
     @test exp_value_op≈ exp_value_ρ
 end
-@testitem "Effective measurements & time evolution" begin
+@testset "Effective measurements & time evolution" begin
     ## Initialize system
     quantum_dot_system = tight_binding_system(2,3,1)
     seed = 2
@@ -37,7 +37,7 @@ end
     time_evolved_states = map(total_state -> state_time_evolution(total_state, t, ham_total, quantum_dot_system.H_total, quantum_dot_system.qn_total), total_states)
     time_evolved_measurements = map(measurement -> operator_time_evolution(measurement, t, ham_total, quantum_dot_system.qn_total, quantum_dot_system.H_total), measurements)
     effective_measurements = map(measurement -> effective_measurement(measurement, reservoir_state, quantum_dot_system), time_evolved_measurements)
-    scrambling = scrambling_map(quantum_dot_system, t, seed)
+    scrambling = scrambling_map(quantum_dot_system, t,charge_measurements, seed)
     
     ind = FermionicHilbertSpaces.indices(quantum_dot_system.H_main_qn, quantum_dot_system.H_main)
     
