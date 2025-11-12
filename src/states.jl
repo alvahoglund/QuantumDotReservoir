@@ -52,6 +52,11 @@ function random_separable_state(nbr_states, qd_system)
     return ρ_sep
 end
 
+function hilbert_schmidt_ensamble(dim)
+    X = (randn(dim, dim) .+ 1im * randn(dim, dim))./sqrt(2)
+    ρ = X'X/tr(X'X)
+    return ρ
+end
 ## =============== Ground States ====================
 function ground_state(hamiltonian :: AbstractMatrix)
     eigenvalues, eigenvectors = eigen(Matrix(hamiltonian))
