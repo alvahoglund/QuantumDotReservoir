@@ -8,9 +8,8 @@ function ridge_regression(X, Y, λ)
     return W
 end
 
-function predict_spin(nbr_states)
+function predict_spin(nbr_states, op)
     t_list = [10, 20, 30]
-    op = σy
     nbr_dots_main, nbr_dots_res, qn_reservoir = (2,2,1)
     measurements_outcomes, spin_measurements, op_R, S = generate_data(nbr_dots_main, nbr_dots_res, qn_reservoir, nbr_states, t_list,op)
     
@@ -33,7 +32,8 @@ function predict_spin(nbr_states)
 end
 
 nbrs = range(10, 200, 50)
-predictions = [predict_spin(nbr) for nbr in nbrs]
+op = (σx, σ0)
+predictions = [predict_spin(nbr, op) for nbr in nbrs]
 mse_test_list = getindex.(predictions, 2)
 op_diff_list = getindex.(predictions, 3)
 plot(nbrs .÷ 2, mse_test_list, ls=:dot, yaxis=:log, xlabel = "Number states in training data", ylabel = "MSE", label = "1/Ntest ∑(<o> - o_pred)^2",legendfont=font(10))
