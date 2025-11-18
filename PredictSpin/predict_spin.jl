@@ -48,4 +48,14 @@ function transform_data(spin_exp_val, charge_exp_val, training_size)
     return X_train, X_test, Y_train, Y_test
 end
 
+function normalize(X_train, X_test)
+    μ = mean(X_train, dims=1)           
+    σ = std(X_train, dims=1, corrected=true) 
+    σ[σ .== 0] .= 1
 
+    X_train_norm = (X_train .- μ) ./ σ
+    X_test_norm  = (X_test  .- μ) ./ σ
+    
+    return X_train_norm, X_test_norm
+
+end

@@ -2,6 +2,7 @@ using Pkg
 Pkg.activate(pwd())
 Pkg.instantiate()
 using LinearAlgebra, FermionicHilbertSpaces, Revise, Random, Arpack, SparseArrays, Plots, LinearMaps, Test, NonCommutativeProducts, Statistics
+using Distributions: Normal
 
 includet("src//quantum_dot_system.jl")
 includet("src//states.jl")
