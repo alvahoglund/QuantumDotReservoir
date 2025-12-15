@@ -32,3 +32,13 @@ charge_measurements(qd_system) = vcat(single_charge_measurements(qd_system), dou
 single_charge_probabilities(qd_system) = [p1(coordinate, qd_system.f) for coordinate in qd_system.coordinates_total]
 double_charge_probabilities(qd_system) = [p2(coordinate, qd_system.f) for coordinate in qd_system.coordinates_total]
 charge_probabilities(qd_system) = vcat(single_charge_probabilities(qd_system), double_charge_probabilities(qd_system))
+
+measurement_combination(qd_system, measurement_combo) = prod([p(measurement_combo[i], coord, qd_system.f) for (i, coord) in enumerate(qd_system.coordinates_total)])
+function correlated_measurements(qd_system)
+    nbr_coordinates = length(qd_system.coordinates_total)
+    all_combos = Iterators.product(ntuple(_ -> 0:2, nbr_coordinates)...)
+    measurement_combos = [measurement_combination(qd_system, measurement_combo)
+            for measurement_combo in all_combos 
+            if qd_system.qn_total == sum(measurement_combo)]
+    return measurement_combos
+end
