@@ -22,8 +22,8 @@ end
 
 ## ============ Singel dot ================
 
-hamiltonian_ϵ(ϵ, coordinate_labels, f) = sum(
-    ϵ[label]*f[label, σ]' * f[label, σ] 
+hamiltonian_ϵ(ϵ,u_intra, coordinate_labels, f) = sum(
+    (ϵ[label]-u_intra[label]/2)*f[label, σ]' * f[label, σ] 
     for σ ∈ [:↑, :↓], label ∈ coordinate_labels;
     init=0
 )
@@ -113,7 +113,7 @@ end
 ## ========= System Hamiltonians =============
 
 hamiltonian_dots(dot_params, coordinates, f) = 
-    hamiltonian_ϵ(dot_params.ϵ, coordinates, f) +  hamiltonian_b(dot_params.ϵb, coordinates, f) + hamiltonian_c_intra(dot_params.u_intra, coordinates, f)
+    hamiltonian_ϵ(dot_params.ϵ, dot_params.u_intra, coordinates, f) +  hamiltonian_b(dot_params.ϵb, coordinates, f) + hamiltonian_c_intra(dot_params.u_intra, coordinates, f)
     
 hamiltonian_interactions(interaction_params, coordinates, f) = 
     hamiltonian_t(interaction_params.t, coordinates, f) + hamiltonian_so(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter(interaction_params.u_inter, coordinates, f) 
