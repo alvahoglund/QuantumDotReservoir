@@ -110,6 +110,28 @@ function get_coupled_coordinates(coordinates)
     return vcat(coupled_coordinates_x, coupled_coordinates_y)
 end
 
+function equal_dot_param(coordinates)
+    ϵ_val = 0
+    ϵb_val= 0
+    u_intra_val = 10
+    ϵ = Dict(coordinate => ϵ_val for coordinate in coordinates)
+    ϵb = Dict(coordinate => ϵb_val for coordinate in coordinates)
+    u_intra = Dict(coordinate => u_intra_val for coordinate in coordinates)
+    return DotParams(ϵ, ϵb, u_intra)
+end
+
+function equal_interaction_param(coordinates)
+    t_val = 2
+    t_so_val = 0
+    u_inter_val = 0
+
+    coupled_coordinates = get_coupled_coordinates(coordinates)
+    t = Dict(coupled_coordinate => t_val for coupled_coordinate in coupled_coordinates)
+    t_so = Dict(coupled_coordinate => t_so_val for coupled_coordinate in coupled_coordinates)
+    u_inter = Dict(coupled_coordinate => u_inter_val for coupled_coordinate in coupled_coordinates)
+    InteractionParams(t,t_so,u_inter)
+end
+
 ## ========= System Hamiltonians =============
 
 hamiltonian_dots(dot_params, coordinates, f) = 
@@ -129,6 +151,19 @@ function hamiltonians(quantum_dot_system)
     dot_params_main = main_system_dot_param(quantum_dot_system.coordinates_main)
     dot_params_reservoir = randomize_dot_param(quantum_dot_system.coordinates_reservoir)
     interaction_params = randomize_interaction_param(quantum_dot_system.coordinates_total)
+
+    hamiltonian_main = hamiltonian_dots(dot_params_main, quantum_dot_system.coordinates_main, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_main, quantum_dot_system.f)
+    hamiltonian_reservoir = hamiltonian_dots(dot_params_reservoir, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f)
+    hamiltonian_intersection = hamiltonian_interactions_x(interaction_params, quantum_dot_system.coordinates_intersection, quantum_dot_system.f)
+    hamiltonian_total = hamiltonian_main + hamiltonian_reservoir + hamiltonian_intersection 
+    return Hamiltonians(hamiltonian_main, hamiltonian_reservoir, hamiltonian_intersection, hamiltonian_total, 
+                        dot_params_main, dot_params_reservoir, interaction_params)
+end
+
+function hamiltonians_equal_param(quantum_dot_system)
+    dot_params_main = equal_dot_param(quantum_dot_system.coordinates_main)
+    dot_params_reservoir = equal_dot_param(quantum_dot_system.coordinates_reservoir)
+    interaction_params = equal_interaction_param(quantum_dot_system.coordinates_total)
 
     hamiltonian_main = hamiltonian_dots(dot_params_main, quantum_dot_system.coordinates_main, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_main, quantum_dot_system.f)
     hamiltonian_reservoir = hamiltonian_dots(dot_params_reservoir, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f) + hamiltonian_interactions(interaction_params, quantum_dot_system.coordinates_reservoir, quantum_dot_system.f)
