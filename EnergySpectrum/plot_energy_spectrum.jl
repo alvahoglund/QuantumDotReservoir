@@ -88,7 +88,7 @@ function plot_spectrum(nbr_dots_res)
         plot_data!(p_es, subplot_idx, vals, E_exp, c_i2, qn_res)
     end
 
-    plot!(p_es[nbr_dots_res+1, 2], get_energy_spectrum(hams, qd_system)[1],  title = "Total energy spectrum")
+    scatter!(p_es[nbr_dots_res+1, 2], get_energy_spectrum(hams, qd_system)[1], color=:white, ms=5, title = "Total energy spectrum")
 
     plot!(p_es, suptitle  = " Energy spectrum of Hamiltonian block \n Dots in reservoir: $(nbr_dots_res)", ylabel   = "Eigenenergy")
     display(p_es)
