@@ -72,15 +72,16 @@ function Sij(coordinate_i, coordinate_j, f, H)
 end
 
 # S^2 operator 
-function total_spin_op(coordinates, f)
-    H_total = hilbert_space(labels(coordinates), NumberConservation())
-    S2_op = sum([Si2(coordinate, f, H_total) for coordinate in coordinates])
-    Sij_op = sum([Sij(coordinate_i, coordinate_j, f, H_total) 
+function total_spin_op(coordinates, f, H)
+    S2_op = sum([Si2(coordinate, f, H) for coordinate in coordinates])
+    Sij_op = sum([Sij(coordinate_i, coordinate_j, f, H) 
                 for (i, coordinate_i) in enumerate(coordinates)
                 for (j, coordinate_j) in enumerate(coordinates)
                 if i<j])
     return S2_op + 2*Sij_op
 end
+
+
 
 #S^2 = S(S+1) if the state is an eigenstate of S^2
 s_from_s2(s2_val) = -1/2 + √(s2_val+1/4)

@@ -43,7 +43,7 @@ function plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
     vals, vecs = get_eigenbasis(coordinates, qn, t_val, U_val)
     vals = real(vals)
     idx = FermionicHilbertSpaces.indices(qn, hilbert_space(labels(coordinates), NumberConservation()))
-    s2_op = total_spin_op(coordinates, f)
+    s2_op = total_spin_op(coordinates, f, hilbert_space(labels(coordinates), NumberConservation()))
 
     s_vals = [s_from_s2(expectation_value(vecs[:,i]*vecs[:,i]', s2_op[idx, idx])) for i in 1:length(vals)]
 
