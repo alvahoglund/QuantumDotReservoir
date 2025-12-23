@@ -42,3 +42,45 @@ function correlated_measurements(qd_system)
             if qd_system.qn_total == sum(measurement_combo)]
     return measurement_combos
 end
+
+## ============= Spin measurements ======================
+
+#Operator for total spin S^2 on coodinate i 
+Si2(coordinate_i, f, H_i) = matrix_representation(3/4*p1(coordinate_i, f), H_i)
+
+# Operator for S_i ⋅ S_j
+function Sij(coordinate_i, coordinate_j, f, H)
+    Hi = hilbert_space(labels([coordinate_i]), NumberConservation())
+    Hj = hilbert_space(labels([coordinate_j]), NumberConservation())
+    Hij = hilbert_space(labels([coordinate_i, coordinate_j]), NumberConservation())
+
+    σxi = matrix_representation(σx(coordinate_i, f), Hi)
+    σxj = matrix_representation(σx(coordinate_j, f), Hj)
+    σxij = tensor_product((σxi, σxj), (Hi, Hj) => Hij)
+
+    σyi = matrix_representation(σy(coordinate_i, f), Hi)
+    σyj = matrix_representation(σy(coordinate_j, f), Hj)
+    σyij = tensor_product((σyi, σyj), (Hi, Hj) => Hij)
+
+    σzi = matrix_representation(σz(coordinate_i, f), Hi)
+    σzj = matrix_representation(σz(coordinate_j, f), Hj)
+    σzij = tensor_product((σzi, σzj), (Hi, Hj) => Hij)
+
+    S_ij = 1/4*(σxij + σyij + σzij)
+
+    return embed(S_ij, Hij=> H)
+end
+
+# S^2 operator 
+function total_spin_op(coordinates, f)
+    H_total = hilbert_space(labels(coordinates), NumberConservation())
+    S2_op = sum([Si2(coordinate, f, H_total) for coordinate in coordinates])
+    Sij_op = sum([Sij(coordinate_i, coordinate_j, f, H_total) 
+                for (i, coordinate_i) in enumerate(coordinates)
+                for (j, coordinate_j) in enumerate(coordinates)
+                if i<j])
+    return S2_op + 2*Sij_op
+end
+
+#S^2 = S(S+1) if the state is an eigenstate of S^2
+s_from_s2(s2_val) = -1/2 + √(s2_val+1/4)
