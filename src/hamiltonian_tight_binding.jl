@@ -111,9 +111,9 @@ function get_coupled_coordinates(coordinates)
 end
 
 function equal_dot_param(coordinates)
-    ϵ_val = 0
-    ϵb_val= 0
-    u_intra_val = 10
+    ϵ_val = 0.0
+    ϵb_val= 0.0
+    u_intra_val = 10.0
     ϵ = Dict(coordinate => ϵ_val for coordinate in coordinates)
     ϵb = Dict(coordinate => ϵb_val for coordinate in coordinates)
     u_intra = Dict(coordinate => u_intra_val for coordinate in coordinates)
@@ -121,9 +121,9 @@ function equal_dot_param(coordinates)
 end
 
 function equal_interaction_param(coordinates)
-    t_val = 2
-    t_so_val = 0
-    u_inter_val = 0
+    t_val = 1.0
+    t_so_val = 0.0
+    u_inter_val = 0.0
 
     coupled_coordinates = get_coupled_coordinates(coordinates)
     t = Dict(coupled_coordinate => t_val for coupled_coordinate in coupled_coordinates)
