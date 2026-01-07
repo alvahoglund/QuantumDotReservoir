@@ -1,7 +1,7 @@
 function get_hams(nbr_dots_res)
     nbr_dots_main, nbr_dots_res, qn_reservoir = 2, nbr_dots_res, 0
     qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
-    return hamiltonians_equal_param(qd_system)
+    return hamiltonians(qd_system)
 end
 
 function get_states(hams, nbr_dots_res, qn_res)
@@ -60,21 +60,22 @@ function von_neumann(ρ)
     S = -sum(λ .* log.(λ))
 end
 
-function mutual_information(coordinate_A, coordinate_B, ρ, qd_system)
-    ρA = partial_trace_dot(ρ, [coordinate_A], qd_system)
-    ρB = partial_trace_dot(ρ, [coordinate_B], qd_system)
-    ρAB = partial_trace_dot(ρ, [coordinate_A, coordinate_B], qd_system)
+function mutual_information(coordinates_A, coordinates_B, ρ, qd_system)
+    ρA = partial_trace_dot(ρ, coordinates_A, qd_system)
+    ρB = partial_trace_dot(ρ, coordinates_B, qd_system)
+    ρAB = partial_trace_dot(ρ, vcat(coordinates_A, coordinates_B), qd_system)
     return von_neumann(ρA) + von_neumann(ρB) - von_neumann(ρAB)
 end
 
 function plot_mutual_information(hams, nbr_dots_res, qn_res, p_mi_sub)
     t_range, ρt_range, qd_system = get_states(hams, nbr_dots_res, qn_res)
-    for (i, coordinate_i) in enumerate(qd_system.coordinates_main)
-        for (j, coordinate_j) in enumerate(qd_system.coordinates_reservoir)
-            mi = map(ρ -> mutual_information(coordinate_i, coordinate_j, ρ, qd_system), ρt_range)
-            plot!(p_mi_sub,t_range, mi, label = "Dot A : $(coordinate_i), Dot B: $(coordinate_j)", legend=:outerright)
-        end
+    for (j, coordinate_j) in enumerate(qd_system.coordinates_reservoir)
+        mi = map(ρ -> mutual_information(qd_system.coordinates_main, [coordinate_j], ρ, qd_system), ρt_range)
+        plot!(p_mi_sub,t_range, mi, label = "Reservoir dot: $(coordinate_j)", legend=:outerright)
     end
+    mi = map(ρ -> mutual_information(qd_system.coordinates_main, qd_system.coordinates_reservoir, ρ, qd_system), ρt_range)
+    plot!(p_mi_sub, t_range, mi, label = "All reservoir dots")
+    plot!(p_mi_sub, title = "$(qn_res) electrons in reservoir")
 end
 
 function plot_mutual_informations(hams, nbr_dots_res)
@@ -83,18 +84,18 @@ function plot_mutual_informations(hams, nbr_dots_res)
         p_mi_sub = p_mi[qn_res+1]
         plot_mutual_information(hams, nbr_dots_res, qn_res, p_mi_sub)
     end
+    plot!(suptitle = "Mutual information of main system and reservoir \n - $(nbr_dots_res) QD in reservoir")
     display(p_mi)
 end
 
-#S(rhoA) + S(rhoB) - S(rhaAB)
-seed = 1
+
+#seed = 1
 nbr_dots = 2
 hams = get_hams(nbr_dots)
 plot_entropies(hams, nbr_dots)
 
 #
-#nbr_dots = 2
-#hams = get_hams(nbr_dots)
-#plot_mutual_informations(hams, nbr_dots)
+nbr_dots = 2
+hams = get_hams(nbr_dots)
+plot_mutual_informations(hams, nbr_dots)
 #
-
