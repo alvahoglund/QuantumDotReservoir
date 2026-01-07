@@ -65,14 +65,19 @@ end
 differences(vals) = [abs(vals[j] - vals[i]) for i in eachindex(vals), j in eachindex(vals) if i<j]
 
 function plot_energy_difference(coordinates, qn, t_val, U_val)
+    # Plot Hubbard Hamiltonian energy differences
     vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
     pd = plot(xlabel = "Energy level difference", xlim =(-1, 11), title= "$(length(coordinates)) dots and $(qn) electrons", size = (700, 400))
     vline!(pd, differences(vals), label = "Hubbard Hamiltonian Energy Differences", linewidth= 2, color = :black)
-    vline!(pd, [2*t_val], label = "t", linewidth =3, linestyle = :dash)
+
+    # Plot energy differences of tunneling hamiltonian
+    H = hilbert_space(labels(coordinates), NumberConservation(qn))
+    ham_t = Matrix(matrix_representation(hamiltonian_t(equal_interaction_param(coordinates).t, coordinates, f), H))
+    vline!(pd, differences(eigen(ham_t).values), label = "Tunneling Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
     vline!(pd, [U_val], label = "U", linewidth =3, linestyle = :dash)
+    
     #vline!(pd, [4*t_val^2/U_val], label = "4t^2/U",linewidth=3, linestyle = :dash)
     vline!(differences(eigen(Matrix(heisenberg_hamiltonian(coordinates, f, t_val, U_val))).values), label = "Heisenberg Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
-    vline!(pd, )
     display(pd)
 end
 
@@ -82,14 +87,25 @@ function heisenberg_hamiltonian(coordinates, f, t_val, U_val)
     Sij_op = sum([-J* Sij(coordinate_i, coordinate_j, f, H_total) 
                 for (coordinate_i, coordinate_j) in get_coupled_coordinates(coordinates)
                 if coordinate_i ∈ coordinates && coordinate_j ∈ coordinates])
-    idx = FermionicHilbertSpaces.indices(length(coordinates), H_total)
+    
+    # Reduce to the subspace where we have one electron per dot
+    idx = FermionicHilbertSpaces.indices(localized_hilbert_space(coordinates), H_total)
     return Sij_op[idx, idx]
 end
 
+function localized_hilbert_space(coordinates)
+    # Subspace with one electron per dot
+    local_qd_hilbert_spaces = [hilbert_space(labels([coordinate]), NumberConservation(1)) for coordinate in coordinates]
+    localized_hilbert_space_temp = local_qd_hilbert_spaces[1]
+    for local_qd_hilbert_space in local_qd_hilbert_spaces[2:end]
+        localized_hilbert_space_temp = tensor_product(localized_hilbert_space_temp, local_qd_hilbert_space)
+    end
+    return localized_hilbert_space_temp
+end
 # ============ Main =========================
 
 @fermions f
-coordinates = [(1,1), (1,2)]
+coordinates = [(1,1), (1,2), (2,1)]
 qn = length(coordinates)
 t_val = 1
 U_val = 10
