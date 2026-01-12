@@ -64,10 +64,40 @@ end
 
 differences(vals) = [abs(vals[j] - vals[i]) for i in eachindex(vals), j in eachindex(vals) if i<j]
 
+function plot_energy_differences(coordinates, t_val, U_val)
+    pd_all = plot(layout = (length(coordinates)*2-1, 1), size = (800, 1100))
+    for qn in 1:length(coordinates)*2-1
+        plot_energy_difference!(pd_all, coordinates, qn, t_val, U_val)
+    end
+    plot!(pd_all, suptitle = "$(length(coordinates)) QDs in total")
+    display(pd_all)
+end
+
+function plot_energy_difference!(pd_all, coordinates, qn, t_val, U_val)
+    # Plot Hubbard Hamiltonian energy differences
+    vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
+    show_legend = qn == 1 ? :topright : false
+    plot!(pd_all[qn, 1], legend = show_legend, xlim =(-1, 11), title= "$(qn) electrons",)
+    if qn == length(coordinates)*2-1
+        plot!(pd_all[qn, 1], xlabel = "Energy level difference")
+    end
+    vline!(pd_all[qn, 1], differences(vals), label = "Hubbard Hamiltonian Energy Differences", linewidth= 2, color = :black)
+
+    # Plot energy differences of tunneling hamiltonian
+    H = hilbert_space(labels(coordinates), NumberConservation(qn))
+    ham_t = Matrix(matrix_representation(hamiltonian_t(equal_interaction_param(coordinates).t, coordinates, f), H))
+    vline!(pd_all[qn, 1], differences(eigen(ham_t).values), label = "Tunneling Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
+    vline!(pd_all[qn, 1], [U_val], label = "U", linewidth =3, linestyle = :dash)
+    
+    #vline!(pd, [4*t_val^2/U_val], label = "4t^2/U",linewidth=3, linestyle = :dash)
+    vline!(pd_all[qn, 1], differences(eigen(Matrix(heisenberg_hamiltonian(coordinates, f, t_val, U_val))).values), label = "Heisenberg Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
+end
+
+
 function plot_energy_difference(coordinates, qn, t_val, U_val)
     # Plot Hubbard Hamiltonian energy differences
     vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
-    pd = plot(xlabel = "Energy level difference", xlim =(-1, 11), title= "$(length(coordinates)) dots and $(qn) electrons", size = (700, 400))
+    pd = plot(xlabel = "Energy difference", xlim =(-1, 11), title= "$(length(coordinates)) dots and $(qn) electrons", size = (700, 400))
     vline!(pd, differences(vals), label = "Hubbard Hamiltonian Energy Differences", linewidth= 2, color = :black)
 
     # Plot energy differences of tunneling hamiltonian
@@ -105,9 +135,11 @@ end
 # ============ Main =========================
 
 @fermions f
-coordinates = [(1,1), (1,2), (2,1)]
-qn = length(coordinates)
+coordinates = [(1,1), (1,2), (2,1), (2,2)]
+qn = 3
 t_val = 1
 U_val = 10
-vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
-plot_energy_difference(coordinates, qn, t_val, U_val)
+
+#vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
+#plot_energy_difference(coordinates, qn, t_val, U_val)
+#plot_energy_differences(coordinates, t_val, U_val)
