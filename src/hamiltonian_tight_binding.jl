@@ -27,13 +27,14 @@ hamiltonian_ϵ(ϵ,u_intra, coordinate_labels, f) = sum(
     for σ ∈ [:↑, :↓], label ∈ coordinate_labels;
     init=0
 )
-
 hamiltonian_b(ϵb, coordinate_labels, f) = sum(
-    ϵb[label]*(-1)^(n+1)*f[label,σ]'f[label,σ]
-    for (n,σ) ∈ enumerate([:↑, :↓]), label ∈ coordinate_labels;
-    init=0
+    ϵb[label] * (
+        f[label, :↑]'*f[label, :↓] +
+        f[label, :↓]'*f[label, :↑]
+    )
+    for label ∈ coordinate_labels;
+    init = 0
 )
-
 hamiltonian_c_intra(u_intra, coordinate_labels, f) = sum(
     u_intra[label]*f[label,:↑]'f[label, :↓]'f[label, :↓]f[label, :↑]
     for label ∈ coordinate_labels;
@@ -105,8 +106,10 @@ function randomize_interaction_param(coordinates)
 end
 
 function get_coupled_coordinates(coordinates)
-    coupled_coordinates_x = [((i,j),(i+1,j)) for (i,j) in coordinates]
-    coupled_coordinates_y = [((i,j),(i,j+1)) for (i,j) in coordinates]
+    coupled_coordinates_x = [((i,j),(i+1,j)) for (i,j) in coordinates 
+                            if (i+1, j) ∈ coordinates]
+    coupled_coordinates_y = [((i,j),(i,j+1)) for (i,j) in coordinates
+                            if (i, j+1) ∈ coordinates]
     return vcat(coupled_coordinates_x, coupled_coordinates_y)
 end
 
