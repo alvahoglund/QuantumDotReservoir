@@ -1,11 +1,21 @@
-
-function def_system(nbr_dots_res, qn_reservoir)
-    nbr_dots_main = 2
-    qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
-    hams = hamiltonians_equal_param(qd_system)
-    ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
-    return qd_system, hams, ρ_res
+function dot_params(ϵ_funct, ϵb_func, u_intra_func, coordinates)
+    ϵ = Dict(coordinate => ϵ_funct() for coordinate in coordinates)
+    ϵb = Dict(coordinate => ϵb_func() for coordinate in coordinates)
+    u_intra = Dict(coordinate => u_intra_func() for coordinate in coordinates)
+    return DotParams(ϵ, ϵb, u_intra)
 end
+
+function interaction_params(t_func, t_so_func, u_inter_func, coordinates)
+    coupled_coordinates = get_coupled_coordinates(coordinates)
+    t = Dict(coupled_coordinate => t_func() for coupled_coordinate in coupled_coordinates)
+    t_so = Dict(coupled_coordinate => t_so_func() for coupled_coordinate in coupled_coordinates)
+    u_inter = Dict(coupled_coordinate => u_inter_func() for coupled_coordinate in coupled_coordinates)
+    InteractionParams(t,t_so,u_inter)
+end
+
+def_system(nbr_dots_res, qn_reservoir) = tight_binding_system(2, nbr_dots_res, qn_reservoir)
+
+get_ρ_res(qd_system, hams) = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
 
 function get_eff_op_t(qd_system, hams, ρ_res, op_symbolic, t_range)
     op = matrix_representation(op_symbolic, qd_system.H_total)
@@ -27,7 +37,7 @@ get_pauli_string_labels() = [conc_s(σi, σj) for σi in ["σ0", "σx", "σy", "
 
 y_clean(y) = map(x -> abs(x) < 1e-10 ? 0.0 : x, y)
 
-overlap(op_t_eff, pauli_string) = real(1/4*tr(op_t_eff*pauli_string)^2)
+overlap(op_t_eff, pauli_string) = real(tr(1/4*op_t_eff*pauli_string)^2)
 
 function get_overlaps(qd_system, eff_op_t_range)
     pauli_string_list =get_pauli_strings(qd_system)
@@ -42,28 +52,44 @@ function plot_overlap(qd_system, t_range, overlap_list)
 
     for (i,ps) in enumerate(pauli_string_labels)
         overlap = overlap_list[i]
-        plot!(ps_overlap_plot[(i - 1) ÷ 4 + 1, (i - 1) % 4 + 1], t_range, y_clean(overlap))
+        plot!(ps_overlap_plot[(i - 1) ÷ 4 + 1, (i - 1) % 4 + 1], t_range, y_clean(overlap), title = ps, legend = false)
     end
     plot!(ps_overlap_plot, suptitle = "Dots in Reservoir: $(length(qd_system.coordinates_reservoir)), Electrons in Reservoir: $(qd_system.qn_reservoir)")
 
     display(ps_overlap_plot)
 end
 
+## ====================================================================
 #Def system
-nbr_dots_res = 2
-qn_reserovoir = 0
-qd_system, hams, ρ_res = def_system(nbr_dots_res, qn_reserovoir)
+nbr_dots_res = 4
+qn_reserovoir = 3
+qd_system = def_system(nbr_dots_res, qn_reserovoir)
+
+#Set parameters
+ϵ_func() = rand()
+ϵb_func() = rand()
+u_intra_func() = (1+rand())*10
+
+t_func() = rand()
+t_so_func() = 0.01 * rand()
+u_inter_func() = rand()
+
+main_system_parameters = dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
+reservoir_parameters = dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_reservoir)
+interaction_parameters = interaction_params(t_func, t_so_func, u_inter_func, qd_system.coordinates_total)
+hams = hamiltonians(qd_system, main_system_parameters, reservoir_parameters, interaction_parameters)
+ρ_res = get_ρ_res(qd_system, hams)
 
 #Choose measurement operator
-op_symbolic = p2((1,1), qd_system.f)
+op_symbolic = p1((2,1), qd_system.f)
 
 #Plot overlap
-t_range = range(0.01,2*π, 100)
+t_range = range(0.01,5*π, 100)
 eff_op_t = get_eff_op_t(qd_system, hams, ρ_res, op_symbolic, t_range)
 overlap_list = get_overlaps(qd_system, eff_op_t)
 plot_overlap(qd_system, t_range, overlap_list)
 
-
+interaction_parameters.t_so
 
 ## Operator
 #correlated_op_symbolic = correlated_measurements(qd_system)[5]
