@@ -128,18 +128,18 @@ function default_interaction_params(coordinates)
     return set_interaction_params(t_func, t_so_func, u_inter_func, coordinates)
 end
 
-function defualt_equal_dot_params(coordinates)
+function default_equal_dot_params(coordinates)
     ϵ_val() = 0.0
-    ϵb_val() = 0.0
+    ϵb_val() = [0, 0, 0]
     u_intra_val() = 10.0
-    return set_dot_params(ϵ, ϵb, u_intra, coordinates)
+    return set_dot_params(ϵ_val, ϵb_val, u_intra_val, coordinates)
 end
 
 function default_equal_interaction_params(coordinates)
     t_val() = 1.0
     t_so_val() = 0.0
     u_inter_val() = 0.0
-    return set_dot_params(t_val, t_so_val, u_inter_val, coordinates)
+    return set_interaction_params(t_val, t_so_val, u_inter_val, coordinates)
 end
 
 ## ========= System Hamiltonians =============
@@ -167,8 +167,8 @@ end
 
 function hamiltonians_equal_param(quantum_dot_system)
     dot_params_main = default_equal_dot_params(quantum_dot_system.coordinates_main)
-    dot_params_reservoir = defaut_equal_dot_params(quantum_dot_system.coordinates_reservoir)
-    interaction_params = default_equal_interaction_param(quantum_dot_system.coordinates_total)
+    dot_params_reservoir = default_equal_dot_params(quantum_dot_system.coordinates_reservoir)
+    interaction_params = default_equal_interaction_params(quantum_dot_system.coordinates_total)
     hamiltonians(quantum_dot_system, dot_params_main, dot_params_reservoir, interaction_params)
 end
 
