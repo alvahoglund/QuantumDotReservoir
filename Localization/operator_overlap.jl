@@ -1,18 +1,3 @@
-function dot_params(ϵ_funct, ϵb_func, u_intra_func, coordinates)
-    ϵ = Dict(coordinate => ϵ_funct() for coordinate in coordinates)
-    ϵb = Dict(coordinate => ϵb_func() for coordinate in coordinates)
-    u_intra = Dict(coordinate => u_intra_func() for coordinate in coordinates)
-    return DotParams(ϵ, ϵb, u_intra)
-end
-
-function interaction_params(t_func, t_so_func, u_inter_func, coordinates)
-    coupled_coordinates = get_coupled_coordinates(coordinates)
-    t = Dict(coupled_coordinate => t_func() for coupled_coordinate in coupled_coordinates)
-    t_so = Dict(coupled_coordinate => t_so_func() for coupled_coordinate in coupled_coordinates)
-    u_inter = Dict(coupled_coordinate => u_inter_func() for coupled_coordinate in coupled_coordinates)
-    InteractionParams(t,t_so,u_inter)
-end
-
 def_system(nbr_dots_res, qn_reservoir) = tight_binding_system(2, nbr_dots_res, qn_reservoir)
 
 get_ρ_res(qd_system, hams) = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
@@ -61,22 +46,22 @@ end
 
 ## ====================================================================
 #Def system
-nbr_dots_res = 4
+nbr_dots_res = 2
 qn_reserovoir = 3
 qd_system = def_system(nbr_dots_res, qn_reserovoir)
 
 #Set parameters
 ϵ_func() = rand()
-ϵb_func() = rand()
+ϵb_func() = [0, 0, 1]
 u_intra_func() = (1+rand())*10
 
 t_func() = rand()
-t_so_func() = 0.01 * rand()
-u_inter_func() = rand()
+t_so_func() = 0
+u_inter_func() = 0
 
-main_system_parameters = dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
-reservoir_parameters = dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_reservoir)
-interaction_parameters = interaction_params(t_func, t_so_func, u_inter_func, qd_system.coordinates_total)
+main_system_parameters = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
+reservoir_parameters = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_reservoir)
+interaction_parameters = set_interaction_params(t_func, t_so_func, u_inter_func, qd_system.coordinates_total)
 hams = hamiltonians(qd_system, main_system_parameters, reservoir_parameters, interaction_parameters)
 ρ_res = get_ρ_res(qd_system, hams)
 

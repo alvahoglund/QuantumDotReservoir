@@ -28,9 +28,11 @@ hamiltonian_ϵ(ϵ,u_intra, coordinate_labels, f) = sum(
     init=0
 )
 hamiltonian_b(ϵb, coordinate_labels, f) = sum(
-    ϵb[label]*(-1)^(n+1)*f[label,σ]'f[label,σ]
-    for (n,σ) ∈ enumerate([:↑, :↓]), label ∈ coordinate_labels;
-    init=0
+        ϵb[label][1] * (f[label, :↑]'f[label, :↓] + f[label, :↓]'f[label,:↑]) + # Bx
+        ϵb[label][2] *(-im*f[label, :↑]'f[label, :↓] + im*f[label, :↓]'f[label, :↑] + #By
+        ϵb[label][3]* (f[label,:↑]'f[label, :↑] - f[label, :↓]'f[label, :↓])) #Bz
+        for label ∈ coordinate_labels;
+        init = 0
 )
 
 hamiltonian_c_intra(u_intra, coordinate_labels, f) = sum(
@@ -81,27 +83,19 @@ hamiltonian_so_y(t_so, coordinate_labels, f) = sum(
 )
 
 ## ========= Set Dot Parameters =============
-
-function main_system_dot_param(coordinates)
-    ϵ = Dict(coordinate => 0.5 for coordinate in coordinates)
-    ϵb = Dict(coordinate => 1 for coordinate in coordinates)
-    u_intra = Dict(coordinate => (rand()+10) for coordinate in coordinates)
+function set_dot_params(ϵ_func, ϵb_func, u_intra_func, coordinates)
+    ϵ = Dict(coordinate => ϵ_func() for coordinate in coordinates)
+    ϵb = Dict(coordinate => ϵb_func() for coordinate in coordinates)
+    u_intra = Dict(coordinate => u_intra_func() for coordinate in coordinates)
     return DotParams(ϵ, ϵb, u_intra)
 end
 
-function randomize_dot_param(coordinates)
-    ϵ = Dict(coordinate => rand() for coordinate in coordinates)
-    ϵb = Dict(coordinate => 1 for coordinate in coordinates)
-    u_intra = Dict(coordinate => (rand()+10) for coordinate in coordinates)
-    return DotParams(ϵ, ϵb, u_intra)
-end
-
-function randomize_interaction_param(coordinates)
+function set_interaction_params(t_func, t_so_func, u_inter_func, coordinates)
     coupled_coordinates = get_coupled_coordinates(coordinates)
-    t = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
-    t_so = Dict(coupled_coordinate => rand()*0.1 for coupled_coordinate in coupled_coordinates)
-    u_inter = Dict(coupled_coordinate => rand() for coupled_coordinate in coupled_coordinates)
-    InteractionParams(t,t_so,u_inter)
+    t = Dict(coupled_coordinate => t_func() for coupled_coordinate in coupled_coordinates)
+    t_so = Dict(coupled_coordinate => t_so_func() for coupled_coordinate in coupled_coordinates)
+    u_inter = Dict(coupled_coordinate => u_inter_func() for coupled_coordinate in coupled_coordinates)
+    return InteractionParams(t,t_so,u_inter)
 end
 
 function get_coupled_coordinates(coordinates)
@@ -112,26 +106,40 @@ function get_coupled_coordinates(coordinates)
     return vcat(coupled_coordinates_x, coupled_coordinates_y)
 end
 
-function equal_dot_param(coordinates)
-    ϵ_val = 0.0
-    ϵb_val= 0.0
-    u_intra_val = 10.0
-    ϵ = Dict(coordinate => ϵ_val for coordinate in coordinates)
-    ϵb = Dict(coordinate => ϵb_val for coordinate in coordinates)
-    u_intra = Dict(coordinate => u_intra_val for coordinate in coordinates)
-    return DotParams(ϵ, ϵb, u_intra)
+function default_main_system_dot_params(coordinates)
+    ϵ_func() = 0.5 
+    ϵb_func() = [0,0,1]
+    u_intra_func() = rand() + 10
+    return set_dot_params(ϵ_func, ϵb_func, u_intra_func, coordinates)
 end
 
-function equal_interaction_param(coordinates)
-    t_val = 1.0
-    t_so_val = 0.0
-    u_inter_val = 0.0
+function defalt_reservoir_dot_params(coordinates)
+    ϵ_func() = rand() 
+    ϵb_func() = [0,0,1]
+    u_intra_func() = rand() + 10
+    return set_dot_params(ϵ_func, ϵb_func, u_intra_func, coordinates)
+end
 
-    coupled_coordinates = get_coupled_coordinates(coordinates)
-    t = Dict(coupled_coordinate => t_val for coupled_coordinate in coupled_coordinates)
-    t_so = Dict(coupled_coordinate => t_so_val for coupled_coordinate in coupled_coordinates)
-    u_inter = Dict(coupled_coordinate => u_inter_val for coupled_coordinate in coupled_coordinates)
-    InteractionParams(t,t_so,u_inter)
+
+function default_interaction_params(coordinates)
+    t_func() = rand()
+    t_so_func() = 0.1*rand()
+    u_inter_func() = rand()
+    return set_interaction_params(t_func, t_so_func, u_inter_func, coordinates)
+end
+
+function defualt_equal_dot_params(coordinates)
+    ϵ_val() = 0.0
+    ϵb_val() = 0.0
+    u_intra_val() = 10.0
+    return set_dot_params(ϵ, ϵb, u_intra, coordinates)
+end
+
+function default_equal_interaction_params(coordinates)
+    t_val() = 1.0
+    t_so_val() = 0.0
+    u_inter_val() = 0.0
+    return set_dot_params(t_val, t_so_val, u_inter_val, coordinates)
 end
 
 ## ========= System Hamiltonians =============
@@ -151,18 +159,16 @@ function hamiltonians(quantum_dot_system, seed)
 end 
 
 function hamiltonians(quantum_dot_system)
-    dot_params_main = main_system_dot_param(quantum_dot_system.coordinates_main)
-    dot_params_reservoir = randomize_dot_param(quantum_dot_system.coordinates_reservoir)
-    interaction_params = randomize_interaction_param(quantum_dot_system.coordinates_total)
-
+    dot_params_main = default_main_system_dot_params(quantum_dot_system.coordinates_main)
+    dot_params_reservoir = defalt_reservoir_dot_params(quantum_dot_system.coordinates_reservoir)
+    interaction_params = default_interaction_params(quantum_dot_system.coordinates_total)
     hamiltonians(quantum_dot_system, dot_params_main, dot_params_reservoir, interaction_params)
 end
 
 function hamiltonians_equal_param(quantum_dot_system)
-    dot_params_main = equal_dot_param(quantum_dot_system.coordinates_main)
-    dot_params_reservoir = equal_dot_param(quantum_dot_system.coordinates_reservoir)
-    interaction_params = equal_interaction_param(quantum_dot_system.coordinates_total)
-
+    dot_params_main = default_equal_dot_params(quantum_dot_system.coordinates_main)
+    dot_params_reservoir = defaut_equal_dot_params(quantum_dot_system.coordinates_reservoir)
+    interaction_params = default_equal_interaction_param(quantum_dot_system.coordinates_total)
     hamiltonians(quantum_dot_system, dot_params_main, dot_params_reservoir, interaction_params)
 end
 
