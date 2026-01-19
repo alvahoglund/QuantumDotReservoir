@@ -28,13 +28,11 @@ hamiltonian_ϵ(ϵ,u_intra, coordinate_labels, f) = sum(
     init=0
 )
 hamiltonian_b(ϵb, coordinate_labels, f) = sum(
-    ϵb[label] * (
-        f[label, :↑]'*f[label, :↓] +
-        f[label, :↓]'*f[label, :↑]
-    )
-    for label ∈ coordinate_labels;
-    init = 0
+    ϵb[label]*(-1)^(n+1)*f[label,σ]'f[label,σ]
+    for (n,σ) ∈ enumerate([:↑, :↓]), label ∈ coordinate_labels;
+    init=0
 )
+
 hamiltonian_c_intra(u_intra, coordinate_labels, f) = sum(
     u_intra[label]*f[label,:↑]'f[label, :↓]'f[label, :↓]f[label, :↑]
     for label ∈ coordinate_labels;
@@ -83,6 +81,7 @@ hamiltonian_so_y(t_so, coordinate_labels, f) = sum(
 )
 
 ## ========= Set Dot Parameters =============
+
 function main_system_dot_param(coordinates)
     ϵ = Dict(coordinate => 0.5 for coordinate in coordinates)
     ϵb = Dict(coordinate => 1 for coordinate in coordinates)
