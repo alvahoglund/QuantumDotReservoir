@@ -58,20 +58,24 @@ function hilbert_schmidt_ensamble(dim)
     return ρ
 end
 ## =============== Ground States ====================
-function ground_state(hamiltonian :: AbstractMatrix)
+function eig_state(hamiltonian :: AbstractMatrix, n)
     eigenvalues, eigenvectors = eigen(Matrix(hamiltonian))
-    ρ = eigenvectors[:, 1] * eigenvectors[:, 1]'
+    ρ = eigenvectors[:, n] * eigenvectors[:, n]'
     return ρ
 end
 
-function ground_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) where T
+ground_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) where T= eig_state(ham, H, qn, 1)
+
+function eig_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int, n) where T
     index_qn = FermionicHilbertSpaces.FermionicHilbertSpaces.indices(qn, H)
     ham_qn = ham[index_qn, index_qn]
     state = spzeros(T, dim(H), dim(H))
-    state[index_qn, index_qn] = ground_state(ham_qn)
+    state[index_qn, index_qn] = eig_state(ham_qn, n)
     return state
 end
 
+eig_state(ham:: NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int, n) = 
+    eig_state(matrix_representation(ham, H), H, qn, n)
 ground_state(ham:: NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) = 
     ground_state(matrix_representation(ham, H), H, qn)
 
