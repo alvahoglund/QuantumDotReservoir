@@ -56,4 +56,13 @@ ham_res = matrix_representation(hams.hamiltonian_reservoir, qd_system.H_reservoi
 vals, vecs = eigen(Matrix(ham_res))
 @show ham_res[i_sub, i_sub]
 
-tr(ρt_range[100]* total_spin_op(qd_system.coordinates_total, qd_system.f, qd_system.H_total))
+
+# Measure spin 
+spin_op_main = total_spin_op(qd_system.coordinates_main, qd_system.f, qd_system.H_main)
+spin_op_res = total_spin_op(qd_system.coordinates_reservoir, qd_system.f, qd_system.H_reservoir)
+spin_op_tot = total_spin_op(qd_system.coordinates_total, qd_system.f, qd_system.H_total)
+
+tr(spin_op_res*ρ_main)
+tr(spin_op_res*ρ_reservoir)
+tr(spin_op_tot*ρ_total)
+tr(spin_op_tot*ρt_range[end])
