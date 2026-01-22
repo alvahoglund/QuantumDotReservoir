@@ -28,9 +28,10 @@ hamiltonian_ϵ(ϵ,u_intra, coordinate_labels, f) = sum(
     init=0
 )
 hamiltonian_b(ϵb, coordinate_labels, f) = sum(
-        ϵb[label][1] * (f[label, :↑]'f[label, :↓] + f[label, :↓]'f[label,:↑]) + # Bx
-        ϵb[label][2] *(-im*f[label, :↑]'f[label, :↓] + im*f[label, :↓]'f[label, :↑] + #By
-        ϵb[label][3]* (f[label,:↑]'f[label, :↑] - f[label, :↓]'f[label, :↓])) #Bz
+        #1/2 as normalization factor for pauli matrices
+        1/2*ϵb[label][1] * (f[label, :↑]'f[label, :↓] + f[label, :↓]'f[label,:↑]) + # Bx
+        1/2*ϵb[label][2] *(-im*f[label, :↑]'f[label, :↓] + im*f[label, :↓]'f[label, :↑]) + #By
+        1/2*ϵb[label][3]* (f[label,:↑]'f[label, :↑] - f[label, :↓]'f[label, :↓]) #Bz
         for label ∈ coordinate_labels;
         init = 0
 )
