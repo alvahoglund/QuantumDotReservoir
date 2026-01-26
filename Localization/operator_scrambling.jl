@@ -1,8 +1,18 @@
 #Here I don't use effective charge measurements
-nbr_dots_main, nbr_dots_res, qn_reservoir = 2, 3, 3
+nbr_dots_main, nbr_dots_res, qn_reservoir = 2, 3, 6
 qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
 seed = 1
-hams = hamiltonians_equal_param(qd_system)
+ϵ_func() = 0
+ϵb_func() = [0,0,0]
+u_intra_func() = 10
+t_func() = 0.1
+t_so_func() = 0
+u_inter() = 0
+
+main_system_dot_params = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
+reservoir_dot_params = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_reservoir)
+interaction_params = set_interaction_params(t_func,t_so_func, u_inter, qd_system.coordinates_total)
+hams = hamiltonians(qd_system, main_system_dot_params,reservoir_dot_params, interaction_params)
 
 idx = FermionicHilbertSpaces.indices(qd_system.qn_total, qd_system.H_total)
 
@@ -19,7 +29,7 @@ V_list = [Vzz, Vxz, Vyx, Vyy]
 op_0 = matrix_representation(p1(qd_system.coordinates_reservoir[end], qd_system.f), qd_system.H_total)
 ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
 
-t_range = range(0.01,30*π, 100)
+t_range = exp10.(range(log10(0.01), log10(5e2), length=500))
 op_t_func(t) = operator_time_evolution(op_0, t, ham_tot, qd_system.qn_total, qd_system.H_total)[idx, idx]
 
 op_t_range = [op_t_func(t) for t in t_range]
@@ -36,7 +46,11 @@ C_f(op_t, V) = tr((op_t*V - V*op_t)'*(op_t*V - V*op_t))
 #end
 
 labels_V = ["Z ⊗ Z", "X ⊗ Z", "Y ⊗ X", "Y ⊗ Y"]
-plot_scrambling = plot(layout = (2, 1))
+plot_scrambling = plot(layout = (2, 1), size = (700, 600))
+vline!(plot_scrambling[2,1], [1/t_func()], color = :black, label = "1/t")
+vline!(plot_scrambling[2,1], [5/(u_intra_func())], color = :black, linestyle = :dash, label = "5/u_intra")
+
+
 for (i, v_i) in enumerate([Vzz, Vxz, Vyx, Vyy])
     plot!(plot_scrambling[1,1], t_range, [real(overlap_func(op_t, v_i)) for op_t in op_t_range].+10^(-30), label = labels_V[i],yaxis = :log,xaxis = :log)
     plot!(plot_scrambling[2,1], t_range, [real(C_f(op_t, v_i)) for op_t in op_t_range].+10^(-30), label = labels_V[i],yaxis = :log, xaxis = :log)
@@ -44,5 +58,7 @@ end
 
 plot!(plot_scrambling[1,1], title = "|tr{V'*N(t)}|^2", legend = :topleft)
 plot!(plot_scrambling[2,1], title = "tr{[N(t), V]'*[N(t), V])}", legend = :topleft)
+
+plot!(plot_scrambling, suptitle = "Reservoir dots: $(nbr_dots_res), Reservoir electrons: $(qn_reservoir), U=$(u_intra_func()) t= $(t_func())")
 
 display(plot_scrambling)
