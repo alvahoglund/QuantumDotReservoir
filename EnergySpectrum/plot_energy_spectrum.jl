@@ -1,7 +1,19 @@
 function get_H_Ham(nbr_dots_res)
     nbr_dots_main, nbr_dots_res, qn_reservoir = 2, nbr_dots_res, 0
     qd_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
-    hams = hamiltonians_equal_param(qd_system)
+    ϵ_func() = 0
+    ϵb_func() = [0, 0, 0]
+    u_intra_func() = 10
+
+    t_func() = 1
+    t_so_func() = 0
+    u_inter_func() = 0
+
+    main_system_parameters = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
+    reservoir_parameters = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_reservoir)
+    interaction_parameters = set_interaction_params(t_func, t_so_func, u_inter_func, qd_system.coordinates_total)
+    hams = hamiltonians(qd_system, main_system_parameters, reservoir_parameters, interaction_parameters)
+
     ham_tot= matrix_representation(hams.hamiltonian_total, qd_system.H_total)
     return hams, qd_system
 end
@@ -22,7 +34,13 @@ end
 function get_state_energy(qn_res, hams, qd_system)
     qd_system_qn = tight_binding_system(2, length(qd_system.coordinates_reservoir), qn_res)
     ρ_main = def_state(triplet_0, qd_system_qn.H_main, qd_system_qn.f)
-    ρ_reservoir = ground_state(hams.hamiltonian_reservoir, qd_system_qn.H_reservoir, qn_res)
+    
+    if qn_res == 0 || qn_res == length(qd_system.coordinates_reservoir)*2
+        ρ_reservoir = ground_state(hams.hamiltonian_reservoir, qd_system_qn.H_reservoir, qn_res)
+    else
+        n = 1
+        ρ_reservoir = eig_state(hams.hamiltonian_reservoir, qd_system_qn.H_reservoir, qn_res, n)
+    end
     ρ_total = tensor_product((ρ_main, ρ_reservoir), (qd_system_qn.H_main, qd_system_qn.H_reservoir) => qd_system_qn.H_total)
     ham_tot = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
 
@@ -106,5 +124,5 @@ function plot_energy_amplitudes_heatmap(nbr_dots_res, qn_res)
     heatmap!(p_heatmap, abs.(c_ij), color=cgrad([:white, :purple]))
 end
 
-plot_energy_amplitudes_heatmap(2,0)
-plot_spectrum(2)
+#plot_energy_amplitudes_heatmap(2,0)
+plot_spectrum(3)
