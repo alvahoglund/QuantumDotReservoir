@@ -36,7 +36,7 @@ state_list = get_states_list(nbr_states)
 E_hs = clean_val.(sum([Matrix(state ⊗ state) for state in state_list])./nbr_states)
 
 ps_2qb = [(1/2).*Matrix(ps[ind,ind]) for ps in pauli_strings(qd_system)]
-F_o = clean_val(real.(sum([Matrix(ps2 ⊗ ps2) for ps2 in ps_2qb])))
+F_o = clean_val(sum([Matrix(ps2 ⊗ ps2) for ps2 in ps_2qb]))
 I_o = Matrix(I, 16,16)
 
 Eρρ = a*I_o+b*F_o
@@ -45,10 +45,10 @@ sum(E_hs - Eρρ)
 ### ====== E[RR'] ================
 nbr_states = 10^5
 R_m = get_states(nbr_states)
-smm = clean_val.(real.(R_m*transpose(R_m).*1/nbr_states))
+clean_val.(real.(R_m*R_m'.*1/nbr_states))
 
 ps_2qb_vec = [(1/2).*reshape(Matrix(ps[ind,ind]), 16,1)  for ps in pauli_strings(qd_system)]
-F_temp = clean_val(real.(sum([ps2*transpose(ps2) for ps2 in ps_2qb_vec])))
+F_temp = clean_val(real.(sum([ps2*ps2' for ps2 in ps_2qb_vec])))
 I_temp = reshape(Matrix(I, 4,4), 16,1)*reshape(Matrix(I, 4,4), 16,1)'
 Eρρ_vec = a*I_temp+b*F_temp
 sum(Eρρ_vec-smm)
@@ -56,11 +56,12 @@ sum(Eρρ_vec-smm)
 ## ======= Pauli basis ===================
 R_m = get_states(nbr_states)
 pauli_mat = pauli_matrix(qd_system)
-R_m_ps = (1/2).*transpose(pauli_mat)*R_m
-smm_ps = R_m_ps*transpose(R_m_ps).*1/nbr_states
+R_m_ps = (1/2).*pauli_mat'*R_m
+smm_ps = R_m_ps*R_m_ps'.*1/nbr_states
 clean_val.(real.(smm_ps))
 
-F_p = (1/4).*transpose(pauli_mat)*F_temp*pauli_mat
-I_p = (1/4).*transpose(pauli_mat)*I_temp*pauli_mat
+F_p = (1/4).*pauli_mat'*F_temp*pauli_mat
+I_p = (1/4).*pauli_mat'*I_temp*pauli_mat
 
 Eρρ_p = a*I_p + b*F_p
+sum(Eρρ_p-smm_ps)
