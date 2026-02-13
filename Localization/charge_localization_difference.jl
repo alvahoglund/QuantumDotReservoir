@@ -80,6 +80,29 @@ function prod_sep_states(qd_system)
     return ρ_states_list, state_labels
 end
 
+function plot_charge_exp_single(nbr_dots_res, qn_res, measurement_op_idx)
+    hams = get_hams(nbr_dots_res)
+    t_range, ρt_range_list, state_labels, qd_system =  get_states(hams, nbr_dots_res, qn_res)
+    
+    coord = qd_system.coordinates_reservoir[end]
+    measurement_op = nothing
+    if measurement_op_idx ==0
+        measurement_op = matrix_representation(p0(coord, qd_system.f), qd_system.H_total)
+    elseif measurement_op_idx == 1
+        measurement_op = matrix_representation(p1(coord, qd_system.f), qd_system.H_total)
+    else 
+        measurement_op = matrix_representation(p2(coord, qd_system.f), qd_system.H_total)
+    end
+    plot_charges = plot(layout = (1, 1), size = (500, 300))
+    plot!(plot_charges, title = "Charge expectation value")
+    for (i, ρt_range) in enumerate(ρt_range_list)
+        exp_value_t = [expectation_value(ρ, measurement_op) for ρ in ρt_range]
+        exp_value_t[abs.(exp_value_t) .< 1e-10] .= 0
+        plot!(plot_charges, t_range, exp_value_t, label = "State: $(state_labels[i])", xlabel = "Time")
+    end
+    display(plot_charges)
+end
+
 function plot_charge_exp(nbr_dots_res, qn_res)
     hams = get_hams(nbr_dots_res)
     t_range, ρt_range_list, state_labels, qd_system =  get_states(hams, nbr_dots_res, qn_res)
@@ -155,5 +178,7 @@ function plot_charge_exp(nbr_dots_res)
     plot!(plot_charges_vary_qn, suptitle = "$(nbr_dots_res) QD in reservoir")
     display(plot_charges_vary_qn)
 end
+
 #plot_charge_exp(2,2)
-plot_charge_exp(2)
+#plot_charge_exp(2)
+plot_charge_exp_single(2,2,1)
