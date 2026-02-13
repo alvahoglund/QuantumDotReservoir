@@ -15,17 +15,17 @@ function temp_interaction_param(coordinates, t_val, t_so_val, u_inter_val)
     InteractionParams(t,t_so,u_inter)
 end
 
-function get_eigenbasis(coordinates, qn, t_val, U_val)
-    ϵ_val = 0
-    ϵb_val = 0
-    u_intra_val = U_val
+function get_eigenbasis(coordinates, qn, t_val, U_val, ϵb_val)
+    ϵ_func = 0
+    ϵb_func = ϵb_val
+    u_intra_func = U_val
 
-    t_val = t_val
-    t_so_val = 0
-    u_inter_val = 0
+    t_func = t_val
+    t_so_func = 0
+    u_inter_func = 0
 
-    dp = temp_dot_param(coordinates, ϵ_val, ϵb_val, u_intra_val)
-    ip = temp_interaction_param(coordinates,t_val,  t_so_val, u_inter_val)
+    dp = temp_dot_param(coordinates, ϵ_func, ϵb_func, u_intra_func)
+    ip = temp_interaction_param(coordinates,t_func,  t_so_func, u_inter_func)
 
     @fermions f
 
@@ -39,8 +39,8 @@ end
 
 # ================= Plot the energy spectrum and teh total spin of each state =============
 
-function plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
-    vals, vecs = get_eigenbasis(coordinates, qn, t_val, U_val)
+function plot_energy_spin_spectrum(coordinates, qn, t_val, U_val, ϵb_val)
+    vals, vecs = get_eigenbasis(coordinates, qn, t_val, U_val, ϵb_val)
     vals = real(vals)
     idx = FermionicHilbertSpaces.indices(qn, hilbert_space(labels(coordinates), NumberConservation()))
     s2_op = total_spin_op(coordinates, f, hilbert_space(labels(coordinates), NumberConservation()))
@@ -75,7 +75,7 @@ end
 
 function plot_energy_difference!(pd_all, coordinates, qn, t_val, U_val)
     # Plot Hubbard Hamiltonian energy differences
-    vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
+    vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val, ϵb_val)
     show_legend = qn == 1 ? :topright : false
     plot!(pd_all[qn, 1], legend = show_legend, xlim =(-1, 11), title= "$(qn) electrons",)
     if qn == length(coordinates)*2-1
@@ -85,7 +85,7 @@ function plot_energy_difference!(pd_all, coordinates, qn, t_val, U_val)
 
     # Plot energy differences of tunneling hamiltonian
     H = hilbert_space(labels(coordinates), NumberConservation(qn))
-    ham_t = Matrix(matrix_representation(hamiltonian_t(equal_interaction_param(coordinates).t, coordinates, f), H))
+    ham_t = Matrix(matrix_representation(hamiltonian_t(default_equal_interaction_params(coordinates).t, coordinates, f), H))
     vline!(pd_all[qn, 1], differences(eigen(ham_t).values), label = "Tunneling Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
     vline!(pd_all[qn, 1], [U_val], label = "U", linewidth =3, linestyle = :dash)
     
@@ -96,13 +96,15 @@ end
 
 function plot_energy_difference(coordinates, qn, t_val, U_val)
     # Plot Hubbard Hamiltonian energy differences
-    vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
+    vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val, ϵb_val)
     pd = plot(xlabel = "Energy difference", xlim =(-1, 11), title= "$(length(coordinates)) dots and $(qn) electrons", size = (700, 400))
     vline!(pd, differences(vals), label = "Hubbard Hamiltonian Energy Differences", linewidth= 2, color = :black)
-
+    
+    print("Vals: \n $(vals)\n Differences: \n $(differences(vals))")
+    
     # Plot energy differences of tunneling hamiltonian
     H = hilbert_space(labels(coordinates), NumberConservation(qn))
-    ham_t = Matrix(matrix_representation(hamiltonian_t(equal_interaction_param(coordinates).t, coordinates, f), H))
+    ham_t = Matrix(matrix_representation(hamiltonian_t(default_equal_interaction_params(coordinates).t, coordinates, f), H))
     vline!(pd, differences(eigen(ham_t).values), label = "Tunneling Hamiltonian Energy Difference", linewidth =3, linestyle = :dash)
     vline!(pd, [U_val], label = "U", linewidth =3, linestyle = :dash)
     
@@ -135,11 +137,12 @@ end
 # ============ Main =========================
 
 @fermions f
-coordinates = [(1,1), (1,2), (2,1), (2,2)]
-qn = 3
+coordinates = [(2,1), (2,2), (3,1),(3,2)]
+qn = 2
 t_val = 1
 U_val = 10
+ϵb_val = [0,0,0]
 
-#vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val)
+vals, vecs = plot_energy_spin_spectrum(coordinates, qn, t_val, U_val, ϵb_val)
 #plot_energy_difference(coordinates, qn, t_val, U_val)
 #plot_energy_differences(coordinates, t_val, U_val)
