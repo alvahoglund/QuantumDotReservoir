@@ -73,14 +73,14 @@ function plot_charge_exp(nbr_dots_res, qn_res, sub_plot)
     for (i,m) in enumerate(p0_measurement_set)
         exp_value_t = [expectation_value(ρ, m) for ρ in ρt_range]
         exp_value_t[abs.(exp_value_t) .< 1e-10] .= 0
-        plot!(sub_plot[qn_res+1,1], t_range, exp_value_t, legend = false)
+        plot!(sub_plot[qn_res+1,1], t_range, exp_value_t, legend = false, xlabel = "time")
     end
 
     plot!(sub_plot[qn_res+1,2], title = "P(1) - $(qn_res) e in reservoir")
     for (i,m) in enumerate(p1_measurement_set)
         exp_value_t = [expectation_value(ρ, m) for ρ in ρt_range]
         exp_value_t[abs.(exp_value_t) .< 1e-10] .= 0
-        plot!(sub_plot[qn_res+1,2], t_range, exp_value_t, legend = false)
+        plot!(sub_plot[qn_res+1,2], t_range, exp_value_t, legend = false,  xlabel = "time")
         
     end
 
@@ -88,7 +88,7 @@ function plot_charge_exp(nbr_dots_res, qn_res, sub_plot)
     for (i,m) in enumerate(p2_measurement_set)
         exp_value_t = [expectation_value(ρ, m) for ρ in ρt_range]
         exp_value_t[abs.(exp_value_t) .< 1e-10] .= 0
-        plot!(sub_plot[qn_res+1,3], t_range, exp_value_t, label = "Coordinate: $(qd_system.coordinates_total[i])", legend = :topright)
+        plot!(sub_plot[qn_res+1,3], t_range, exp_value_t, label = "Coordinate: $(qd_system.coordinates_total[i])", legend = :topright,  xlabel = "time")
     end
 end
 
