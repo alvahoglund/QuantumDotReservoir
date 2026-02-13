@@ -57,6 +57,12 @@ function hilbert_schmidt_ensamble(dim)
     ρ = X'X/tr(X'X)
     return ρ
 end
+
+function random_pure_states(dim)
+    Ψ = (randn(dim) .+ 1im*randn(dim))'
+    ρ = Ψ'Ψ /tr(Ψ'Ψ)
+    return ρ
+end
 ## =============== Ground States ====================
 function eig_state(hamiltonian :: AbstractMatrix, n)
     eigenvalues, eigenvectors = eigen(Matrix(hamiltonian))
