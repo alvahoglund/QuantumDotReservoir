@@ -1,10 +1,4 @@
 #### ===== FUNCTIONS ================
-function pauli_matrix(qd_system)
-    ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
-    pauli_mat = hcat([vec(pauli_string[ind,ind]') for pauli_string in pauli_strings(qd_system)]...)
-    return pauli_mat
-end
-
 function random_pure_states(dim)
     Ψ = (randn(dim) .+ 1im*randn(dim))'
     ρ = Ψ'Ψ /tr(Ψ'Ψ)
@@ -55,13 +49,14 @@ sum(Eρρ_vec-smm)
 
 ## ======= Pauli basis ===================
 R_m = get_states(nbr_states)
-pauli_mat = pauli_matrix(qd_system)
-R_m_ps = (1/2).*pauli_mat'*R_m
+pauli_mat = pauli_string_matrix(qd_system)
+R_m_ps = (1/2).*pauli_mat*R_m
 smm_ps = R_m_ps*R_m_ps'.*1/nbr_states
 clean_val.(real.(smm_ps))
 
-F_p = (1/4).*pauli_mat'*F_temp*pauli_mat
-I_p = (1/4).*pauli_mat'*I_temp*pauli_mat
+F_p = (1/4).*pauli_mat*F_temp*pauli_mat'
+I_p = (1/4).*pauli_mat*I_temp*pauli_mat'
 
 Eρρ_p = a*I_p + b*F_p
+
 sum(Eρρ_p-smm_ps)

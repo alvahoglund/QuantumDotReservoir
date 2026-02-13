@@ -24,6 +24,13 @@ variance(ρ, op) =expectation_value(ρ, op^2) - expectation_value(ρ, op)^2
 ## ======== Measurement sets =================
 
 pauli_strings(qd_system) = [pauli_string(σi, σj, qd_system) for σi in [σ0, σx, σy, σz] for σj in [σ0, σx, σy, σz]]
+pauli_string_labels() = ["$(a) ⊗ $(b)" for a in ["σ0", "σx", "σy", "σz"] for b in ["σ0", "σx", "σy", "σz"]]
+function pauli_string_matrix(qd_system)
+    #A matrix where row is a row vectorized pauli matrix:  |σ_i ⊗ σ_j) = vec(σ_i ⊗ σ_j)^†
+    ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
+    pauli_mat = vcat([reshape(pauli_string[ind,ind], 16,1)' for pauli_string in pauli_strings(qd_system)]...)
+    return pauli_mat
+end
 
 single_charge_measurements(qd_system) = [nbr_op(coordinate, qd_system.f) for coordinate in qd_system.coordinates_total]
 double_charge_measurements(qd_system) = [nbr2_op(coordinate, qd_system.f) for coordinate in qd_system.coordinates_total]
