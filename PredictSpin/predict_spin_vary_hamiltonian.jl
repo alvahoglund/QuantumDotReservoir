@@ -3,12 +3,12 @@ includet("predict_spin.jl")
 ## ======= DEFINE PARAMETERS =========
 #Reservoir
 nbr_dots_res = 2
-qn_reservoir =2
+qn_reservoir =1
 seed = 2
 
 #Measurements
 noise_std = 0
-op = (σy, σy)
+op = (σx, σy)
 
 #Training and test
 nbr_states = 2*10000
@@ -22,7 +22,7 @@ qd_system = tight_binding_system(2, nbr_dots_res, qn_reservoir)
 u_intra_func() = 10
 
 t_func() = 1
-t_so_func() = 0
+t_so_func() = 1
 u_inter_func() = 0
 
 main_system_parameters = set_dot_params(ϵ_func, ϵb_func, u_intra_func, qd_system.coordinates_main)
@@ -35,8 +35,8 @@ hamiltonian_total = matrix_representation(hams.hamiltonian_total, qd_system.H_to
 
 measurements = map(op -> matrix_representation(op, qd_system.H_total), charge_probabilities(qd_system))
 
-t = 100
-S = scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t)
+t_list = [100, 200, 300]
+S = vcat([scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t) for t in t_list]...)
 
 rank(S)
 ## ==================================
@@ -54,9 +54,8 @@ idx_sort = sortperm(Y_test)
 Y_pred_sorted = Y_test_pred[idx_sort]
 Y_true_sorted = Y_test[idx_sort]
 
-Y_pred_sorted[1:10:end]
-plot(Y_true_sorted[1:10:end], seriestype=:scatter)
-plot!(Y_pred_sorted[1:10:end], seriestype=:scatter)
-plot!(title = "Predicting $(join(string.(nameof.(op)), " ⊗"))")
-
+plot_vh = plot(Y_true_sorted[1:10:end], seriestype=:scatter)
+plot!(plot_vh, Y_pred_sorted[1:10:end], seriestype=:scatter)
+plot!(plot_vh, title = "Predicting $(join(string.(nameof.(op)), " ⊗"))")
+display(plot_vh)
  
