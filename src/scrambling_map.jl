@@ -28,12 +28,3 @@ function scrambling_map(qd_system, t_list :: AbstractArray, measurement_types, s
     scrambling_maps = [scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t) for t in t_list]
     return vcat(scrambling_maps...)
 end
-
-
-function pauli_string_map(qd_system)
-    measurements = pauli_strings(qd_system)
-    ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
-    measurements = map(op -> op[ind,ind], measurements) 
-    pauli_string_map = vcat([vec(m)' for m in measurements]...)
-    return pauli_string_map
-end
