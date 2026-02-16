@@ -1,5 +1,5 @@
-get_states(nbr_states) = hcat([reshape(hilbert_schmidt_ensamble(4), 16,1) for i in 1:nbr_states]...)
-
+get_states(nbr_states) = hcat([reshape(random_pure_states(4), 16,1) for i in 1:nbr_states]...)
+get_states(nbr_states, state_type) = hcat([reshape(state_type(4), 16,1) for i in 1:nbr_states]...)
 function vectorize_operator(op_symbolic, qd_system)
     ind_qn = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
     op_matrix = pauli_string(op_symbolic[1], op_symbolic[2], qd_system)[ind_qn,ind_qn]
@@ -29,6 +29,12 @@ function get_S(nbr_dots_res, qn_reserovoir, t_list, seed, measurement_type)
 end
 
 ridge_regression(X,Y, λ) = pinv(X' * X + λ * I) * X' * Y
+
+function measure_spin_charge(states, qd_system, S, op_symbolic, noise_std, seed)
+    Random.seed!(seed)
+    measure_spin_charge(states, qd_system, S, op_symbolic, noise_std)
+end
+
 
 function measure_spin_charge(states, qd_system, S, op_symbolic, noise_std)
     op_vec, spin_exp_val = measure_spin(op_symbolic, states, qd_system)
