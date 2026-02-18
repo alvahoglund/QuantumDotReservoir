@@ -1,7 +1,5 @@
 ##############
 using QuantumDotReservoir
-using FermionicHilbertSpaces
-using FermionicHilbertSpaces: indices
 nbr_dots_main = 2
 nbr_dots_res = 6
 qn_reservoir = 0
@@ -25,7 +23,7 @@ ham_total = matrix_representation(hams.hamiltonian_total,quantum_dot_system.H_to
 time_evolved_states = map(total_state -> state_time_evolution(total_state, t, ham_total, quantum_dot_system.H_total, quantum_dot_system.qn_total), total_states)
 time_evolved_measurements = map(measurement -> operator_time_evolution(measurement, t, ham_total, quantum_dot_system.qn_total, quantum_dot_system.H_total), measurements)
 effective_measurements = map(measurement -> effective_measurement(measurement, reservoir_state, quantum_dot_system), time_evolved_measurements)
-sm = scrambling_map(quantum_dot_system, measurements, reservoir_state, matrix_representation(hams.hamiltonian_total, quantum_dot_system.H_total), t)
+@time sm = scrambling_map(quantum_dot_system, measurements, reservoir_state, ham_total, t);
 
 measured_values = map(m -> expectation_value(time_evolved_states[3], m), measurements)
 if nbr_dots_res≥6

@@ -1,14 +1,16 @@
-# using Pkg
-# Pkg.activate(pwd())
-# Pkg.instantiate()
 module QuantumDotReservoir
-using LinearAlgebra, FermionicHilbertSpaces, Revise, Random, Arpack, SparseArrays, Plots, LinearMaps, Test, NonCommutativeProducts, Statistics
+using LinearAlgebra, Random, Arpack, SparseArrays, LinearMaps
+using Reexport
+@reexport using FermionicHilbertSpaces
+@reexport using FermionicHilbertSpaces: indices
+
 using Distributions: Normal
 
-export tight_binding_system, hamiltonians
+export tight_binding_system, hamiltonians, hamiltonian_dots, hamiltonian_interactions
 export random_separable_state, random_product_state, triplet_plus, singlet, ground_state, def_state
 export charge_measurements, effective_measurement, scrambling_map, expectation_value
 export state_time_evolution, operator_time_evolution
+export set_dot_params, set_interaction_params
 
 include("quantum_dot_system.jl")
 include("states.jl")

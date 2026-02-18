@@ -80,8 +80,8 @@ function eig_state(ham :: AbstractMatrix{T}, H ::FermionicHilbertSpaces.Abstract
     return state
 end
 
-eig_state(ham:: NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int, n) = 
+eig_state(ham::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int, n) = 
     eig_state(matrix_representation(ham, H), H, qn, n)
-ground_state(ham:: NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) = 
+ground_state(ham::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn :: Int) = 
     ground_state(matrix_representation(ham, H), H, qn)
 
