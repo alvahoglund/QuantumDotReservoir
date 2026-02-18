@@ -9,10 +9,8 @@ function scrambling_map(qd_system :: QuantumDotSystem, measurements, ρ_res, ham
     return scrambling_map
 end
 
-scrambling_map(qd_system, t::Number, seed = nothing) = scrambling_map(qd_system, t, charge_measurements, seed) 
-scrambling_map(qd_system, t_list::AbstractArray, seed = nothing) = scrambling_map(qd_system, t_list, charge_measurements, seed) 
 
-function scrambling_map(qd_system, t::Number, measurement_types, seed = nothing)    
+function scrambling_map(qd_system, t::Number, measurement_types = charge_measurements, seed = nothing)    
     isnothing(seed) ? hams = hamiltonians(qd_system) : hams = hamiltonians(qd_system, seed)
     hamiltonian_total = matrix_representation(hams.hamiltonian_total, qd_system. H_total)
     ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)

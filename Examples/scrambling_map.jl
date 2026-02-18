@@ -1,4 +1,7 @@
 ##############
+using QuantumDotReservoir
+using FermionicHilbertSpaces
+using FermionicHilbertSpaces: indices
 nbr_dots_main = 2
 nbr_dots_res = 6
 qn_reservoir = 0
@@ -6,7 +9,7 @@ quantum_dot_system = tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reserv
 seed = 2
 hams = hamiltonians(quantum_dot_system, seed)
 reservoir_state = ground_state(hams.hamiltonian_reservoir, quantum_dot_system.H_reservoir, quantum_dot_system.qn_reservoir)
-ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
+ind = indices(quantum_dot_system.H_main_qn, quantum_dot_system.H_main)
 
 initial_states = [def_state(triplet_plus, quantum_dot_system.H_main, quantum_dot_system.f),
                     def_state(singlet, quantum_dot_system.H_main, quantum_dot_system.f),

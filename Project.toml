@@ -1,3 +1,8 @@
+name = "QuantumDotReservoir"
+uuid = "a8eb8c1c-a57f-457e-a3ea-da0f1636d681"
+version = "0.1"
+authors = ["Alva Höglund", "Viktor Svensson"]
+
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
