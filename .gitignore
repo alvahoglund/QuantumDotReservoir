@@ -2,4 +2,3 @@
 *.npy
 *.txt
 /workbook*
-/Manifest*.toml
