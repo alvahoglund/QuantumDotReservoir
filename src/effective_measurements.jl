@@ -2,9 +2,11 @@ function effective_measurement(op, ρ_reservoir, H_main_qn, H_reservoir, H_total
     H_main = hilbert_space(keys(H_main_qn), NumberConservation()) 
     # Is this the best way to extend the Hilbert space? 
     #Could also input the total main Hilbert space and run sector(qn, H) to get the subsystem, but then I loose the option of having ssub H_main with one particle in each dot.
-    
-    exp_value(ρ_m) = tr(op*(tensor_product((ρ_m, ρ_reservoir), (H_main, H_reservoir) => H_total)))
-    
+
+    ρ_reservoir_tot = embed(ρ_reservoir, H_reservoir => H_total; complement = H_main)
+    op_rho = partial_trace(op*ρ_reservoir_tot, H_total => H_main; complement = H_reservoir, alg = FermionicHilbertSpaces.FullPartialTraceAlg())
+    exp_value(ρ_m) = dot(ρ_m', op_rho)
+ 
     function func(ρ_main_qn_vec)
         ρ_main_qn = reshape(ρ_main_qn_vec, dim(H_main_qn), dim(H_main_qn))
         
