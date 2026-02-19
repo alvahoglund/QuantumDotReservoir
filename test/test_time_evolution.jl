@@ -28,7 +28,7 @@ end
                         random_product_state(quantum_dot_system),
                         random_separable_state(3, quantum_dot_system)]
 
-    total_states = map(initial_state -> tensor_product((initial_state, reservoir_state), (quantum_dot_system.H_main, quantum_dot_system.H_reservoir)=> quantum_dot_system.H_total; physical_algebra = true), initial_states)
+    total_states = map(initial_state -> tensor_product((initial_state, reservoir_state), (quantum_dot_system.H_main, quantum_dot_system.H_reservoir)=> quantum_dot_system.H_total), initial_states)
     measurements = map(op -> matrix_representation(op, quantum_dot_system.H_total), charge_measurements(quantum_dot_system))
 
     t = 10

@@ -32,7 +32,7 @@ sm_full ≈ sm_block ≈ sm_pure
 ##
 # ind = indices(sys.H_main_qn, sys.H_main)
 
-# total_states = map(initial_state -> tensor_product((initial_state, ρres), (sys.H_main, sys.H_reservoir) => sys.H_total; physical_algebra=true), initial_states);
+# total_states = map(initial_state -> tensor_product((initial_state, ρres), (sys.H_main, sys.H_reservoir) => sys.H_total), initial_states);
 initial_states = [def_state(triplet_plus, sys.H_main, sys.f),
     def_state(singlet, sys.H_main, sys.f),
     random_product_state(sys),
