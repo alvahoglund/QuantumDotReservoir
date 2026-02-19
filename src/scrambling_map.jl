@@ -2,7 +2,12 @@ abstract type AbstractPropagatorAlg end
 struct FullPropagatorAlg <: AbstractPropagatorAlg end
 struct BlockPropagatorAlg <: AbstractPropagatorAlg end
 
-function scrambling_map(qd_system::QuantumDotSystem, measurements, ρ_res, hamiltonian_total, t, ::FullPropagatorAlg)
+function scrambling_map(qd_system::QuantumDotSystem, measurements, ψres, hamiltonian_total, t, ::FullPropagatorAlg)
+    ρ_res = if ψres isa AbstractVector
+        ψres * ψres'
+    else
+        ψres
+    end
     prop = propagator(t, hamiltonian_total, qd_system.qn_total, qd_system.H_total)
     process_measurements = op -> effective_measurement(
         operator_time_evolution(prop, sparse(op)), ρ_res, qd_system
@@ -13,20 +18,21 @@ function scrambling_map(qd_system::QuantumDotSystem, measurements, ρ_res, hamil
 end
 
 
-function scrambling_map(qd_system, t::Number, measurement_types=charge_measurements, seed=nothing)
-    isnothing(seed) ? hams = hamiltonians(qd_system) : hams = hamiltonians(qd_system, seed)
+function scrambling_map(qd_system, t::Number, measurement_types=charge_measurements, alg=BlockPropagatorAlg(); seed=nothing)
+    hams = hamiltonians(qd_system, seed)
     hamiltonian_total = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
     ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
     measurements = map(op -> matrix_representation(op, qd_system.H_total), measurement_types(qd_system))
-    return scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t)
+    return scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t, alg)
 end
 
-function scrambling_map(qd_system, t_list::AbstractArray, measurement_types, seed=nothing)
-    isnothing(seed) ? hams = hamiltonians(qd_system) : hams = hamiltonians(qd_system, seed)
+function scrambling_map(qd_system, t_list::AbstractArray, measurement_types, alg=BlockPropagatorAlg(); seed=nothing)
+    hams = hamiltonians(qd_system, seed)
     hamiltonian_total = matrix_representation(hams.hamiltonian_total, qd_system.H_total)
-    ρ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
+    ψ_res = ground_state(hams.hamiltonian_reservoir, qd_system.H_reservoir, qd_system.qn_reservoir)
+    ρ_res = ψ_res * ψ_res'
     measurements = map(op -> matrix_representation(op, qd_system.H_total), measurement_types(qd_system))
-    scrambling_maps = [scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t) for t in t_list]
+    scrambling_maps = [scrambling_map(qd_system, measurements, ρ_res, hamiltonian_total, t, alg) for t in t_list]
     return vcat(scrambling_maps...)
 end
 
@@ -39,7 +45,12 @@ function pauli_string_map(qd_system)
     return pauli_string_map
 end
 
-function scrambling_map(qd_system::QuantumDotSystem, measurements, ρ_res, hamiltonian_total, t, ::BlockPropagatorAlg)
+function scrambling_map(qd_system::QuantumDotSystem, measurements, ψres, hamiltonian_total, t, ::BlockPropagatorAlg)
+    ρ_res = if ψres isa AbstractVector
+        ψres * ψres'
+    else
+        ψres
+    end
     prop = propagator(t, hamiltonian_total, qd_system.qn_total, qd_system.H_total)
     inds = indices(qd_system.qn_total, qd_system.H_total)
     prop_block = Matrix(prop[inds, inds])

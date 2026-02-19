@@ -154,12 +154,8 @@ hamiltonian_interactions(interaction_params, coordinates, f) =
 hamiltonian_interactions_x(interaction_params, coordinates, f) = 
     hamiltonian_t_x(interaction_params.t, coordinates, f) + hamiltonian_so_x(interaction_params.t_so, coordinates, f) + hamiltonian_c_inter_x(interaction_params.u_inter, coordinates, f) 
 
-function hamiltonians(quantum_dot_system, seed)
-    Random.seed!(seed)
-    return hamiltonians(quantum_dot_system)
-end 
-
-function hamiltonians(quantum_dot_system)
+function hamiltonians(quantum_dot_system, seed = nothing)
+    isnothing(seed) || Random.seed!(seed)
     dot_params_main = default_main_system_dot_params(quantum_dot_system.coordinates_main)
     dot_params_reservoir = defalt_reservoir_dot_params(quantum_dot_system.coordinates_reservoir)
     interaction_params = default_interaction_params(quantum_dot_system.coordinates_total)
