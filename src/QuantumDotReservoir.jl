@@ -1,8 +1,9 @@
 module QuantumDotReservoir
 using LinearAlgebra, Random, Arpack, SparseArrays, LinearMaps
+using ExponentialUtilities
 using Reexport
 @reexport using FermionicHilbertSpaces
-@reexport using FermionicHilbertSpaces: indices
+@reexport using FermionicHilbertSpaces: indices, sector
 
 using Distributions: Normal
 
