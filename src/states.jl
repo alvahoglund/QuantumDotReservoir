@@ -69,8 +69,6 @@ struct ExactDiagonalizationAlg <: DiagonalizationAlg end
 function eig_state(hamiltonian::AbstractMatrix, n, ::ExactDiagonalizationAlg)
     eigenvalues, eigenvectors = eigen(Matrix(hamiltonian))
     eigenvectors[:, n]
-    # ρ = eigenvectors[:, n] * eigenvectors[:, n]'
-    # return ρ
 end
 
 ground_state(ham::AbstractMatrix{T}, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn::Int, alg=ExactDiagonalizationAlg()) where T = eig_state(ham, H, qn, 1, alg)

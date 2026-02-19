@@ -1,7 +1,6 @@
 abstract type AbstractPropagatorAlg end
 struct FullPropagatorAlg <: AbstractPropagatorAlg end
 struct BlockPropagatorAlg <: AbstractPropagatorAlg end
-struct KrylovPropagatorAlg <: AbstractPropagatorAlg end
 
 function scrambling_map(qd_system::QuantumDotSystem, measurements, ρ_res, hamiltonian_total, t, ::FullPropagatorAlg)
     prop = propagator(t, hamiltonian_total, qd_system.qn_total, qd_system.H_total)
@@ -54,13 +53,12 @@ function scrambling_map(qd_system::QuantumDotSystem, measurements, ρ_res, hamil
     scrambling_map = vcat([vec(m)' for m in eff_measurements]...)
     return scrambling_map
 end
-import FermionicHilbertSpaces: sector
+
 struct PureStatePropagatorAlg <: AbstractPropagatorAlg
     krylov_dim::Int
     tol::Float64
 end
 PureStatePropagatorAlg(; krylov_dim=200, tol=1e-6) = PureStatePropagatorAlg(krylov_dim, tol)
-
 function scrambling_map(sys::QuantumDotSystem, measurements, ψres::AbstractVector, hamiltonian, t, alg::PureStatePropagatorAlg)
     iH = -im .* hamiltonian
     N = dim(sys.H_total_qn)
