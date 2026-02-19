@@ -2,7 +2,7 @@
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "9be07daa51b285261c8162dc9eee9b9fc067b93c"
+project_hash = "79522223bf244de50cb246eccca9ce2b153267d2"
 
 [[deps.Accessors]]
 deps = ["CompositionsBase", "ConstructionBase", "Dates", "InverseFunctions", "MacroTools"]
@@ -77,6 +77,17 @@ version = "0.1.102"
     URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
+[[deps.Adapt]]
+deps = ["LinearAlgebra", "Requires"]
+git-tree-sha1 = "7e35fca2bdfba44d797c53dfe63a51fabf39bfc0"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "4.4.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptSparseArraysExt = "SparseArrays"
+    AdaptStaticArraysExt = "StaticArrays"
+
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
 git-tree-sha1 = "9876e1e164b144ca45e9e3198d0b689cadfed9ff"
@@ -86,6 +97,12 @@ version = "1.1.3"
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.2"
+
+[[deps.ArnoldiMethod]]
+deps = ["LinearAlgebra", "Random", "StaticArrays"]
+git-tree-sha1 = "d57bd3762d308bded22c3b82d033bff85f6195c6"
+uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
+version = "0.4.0"
 
 [[deps.Arpack]]
 deps = ["Arpack_jll", "Libdl", "LinearAlgebra", "Logging"]
@@ -98,6 +115,40 @@ deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "li
 git-tree-sha1 = "7f54761502ff149a9d492e4acefe9805898e29b3"
 uuid = "68821587-b530-5797-8361-c406ea357684"
 version = "3.5.2+0"
+
+[[deps.ArrayInterface]]
+deps = ["Adapt", "LinearAlgebra"]
+git-tree-sha1 = "d81ae5489e13bc03567d4fbbb06c546a5e53c857"
+uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
+version = "7.22.0"
+
+    [deps.ArrayInterface.extensions]
+    ArrayInterfaceBandedMatricesExt = "BandedMatrices"
+    ArrayInterfaceBlockBandedMatricesExt = "BlockBandedMatrices"
+    ArrayInterfaceCUDAExt = "CUDA"
+    ArrayInterfaceCUDSSExt = ["CUDSS", "CUDA"]
+    ArrayInterfaceChainRulesCoreExt = "ChainRulesCore"
+    ArrayInterfaceChainRulesExt = "ChainRules"
+    ArrayInterfaceGPUArraysCoreExt = "GPUArraysCore"
+    ArrayInterfaceMetalExt = "Metal"
+    ArrayInterfaceReverseDiffExt = "ReverseDiff"
+    ArrayInterfaceSparseArraysExt = "SparseArrays"
+    ArrayInterfaceStaticArraysCoreExt = "StaticArraysCore"
+    ArrayInterfaceTrackerExt = "Tracker"
+
+    [deps.ArrayInterface.weakdeps]
+    BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
+    BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    CUDSS = "45b445bb-4962-46a0-9369-b4df9d0f772e"
+    ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
+    Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -324,6 +375,16 @@ git-tree-sha1 = "27af30de8b5445644e8ffe3bcb0d72049c089cf1"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.7.3+0"
 
+[[deps.ExponentialUtilities]]
+deps = ["Adapt", "ArrayInterface", "GPUArraysCore", "GenericSchur", "LinearAlgebra", "PrecompileTools", "Printf", "SparseArrays", "libblastrampoline_jll"]
+git-tree-sha1 = "cc294ead6a85e975a8519dd4a0a6cb294eeb18d1"
+uuid = "d4d017d3-3776-5f7e-afef-a10c40355c18"
+version = "1.30.0"
+weakdeps = ["StaticArrays"]
+
+    [deps.ExponentialUtilities.extensions]
+    ExponentialUtilitiesStaticArraysExt = "StaticArrays"
+
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
 git-tree-sha1 = "95ecf07c2eea562b5adbd0696af6db62c0f52560"
@@ -344,7 +405,7 @@ version = "1.1.0"
 
 [[deps.FermionicHilbertSpaces]]
 deps = ["BitPermutations", "Dictionaries", "FillArrays", "FlexiGroups", "LinearAlgebra", "NonCommutativeProducts", "OrderedCollections", "PrecompileTools", "SparseArrays", "TestItems", "TupleTools", "UUIDs"]
-git-tree-sha1 = "15323ff4409312d08c49ed8ea64247ce7ee9b1ac"
+git-tree-sha1 = "cd405e3898fef31650f49aff6b32e0487ef7bde4"
 repo-rev = "faster-partial-trace-for-sparse-operators"
 repo-url = "https://github.com/cvsvensson/FermionicHilbertSpaces.jl"
 uuid = "82e5dd95-83c3-46b2-a303-acc930c81756"
@@ -440,6 +501,12 @@ git-tree-sha1 = "b7bfd56fa66616138dfe5237da4dc13bbd83c67f"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
 version = "3.4.1+0"
 
+[[deps.GPUArraysCore]]
+deps = ["Adapt"]
+git-tree-sha1 = "83cf05ab16a73219e5f6bd1bdfa9848fa24ac627"
+uuid = "46192b85-c4d5-4398-a991-12ede77f4527"
+version = "0.2.0"
+
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
 git-tree-sha1 = "ee0585b62671ce88e48d3409733230b401c9775c"
@@ -467,6 +534,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "7da3a878517e1420850569d35d9ba583b745e39d"
 uuid = "1b77fbbe-d8ee-58f0-85f9-836ddc23a7a4"
 version = "2.8.1+0"
+
+[[deps.GenericSchur]]
+deps = ["LinearAlgebra", "Printf"]
+git-tree-sha1 = "a694e2a57394e409f7a11ee0977362a9fafcb8c7"
+uuid = "c145ed77-6b09-5dd9-b285-bf645a82121e"
+version = "0.5.6"
 
 [[deps.GettextRuntime_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll"]
@@ -993,7 +1066,7 @@ version = "2.11.2"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.QuantumDotReservoir]]
-deps = ["Arpack", "Distributions", "FermionicHilbertSpaces", "IJulia", "LinearAlgebra", "LinearMaps", "Plots", "PyCall", "Random", "RandomMatrices", "Reexport", "SparseArrays", "Statistics", "StatsBase", "TestItems"]
+deps = ["ArnoldiMethod", "Arpack", "Distributions", "ExponentialUtilities", "FermionicHilbertSpaces", "IJulia", "LinearAlgebra", "LinearMaps", "Plots", "PyCall", "Random", "RandomMatrices", "Reexport", "SparseArrays", "Statistics", "StatsBase", "Test", "TestItems"]
 path = "."
 uuid = "a8eb8c1c-a57f-457e-a3ea-da0f1636d681"
 version = "0.1.0"
