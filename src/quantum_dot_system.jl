@@ -36,7 +36,6 @@ function tight_binding_system(nbr_dots_main, nbr_dots_res, qn_reservoir)
     H_reservoir = hilbert_space(labels(coordinates_reservoir), NumberConservation())
     H_total = hilbert_space(labels(coordinates_total), NumberConservation())
     H_total_qn = sector(qn_total, H_total)
-    H_main_qn = sector(nbr_dots_main, H_main)
     H_reservoir_qn = sector(qn_reservoir, H_reservoir)
 
     @fermions f
