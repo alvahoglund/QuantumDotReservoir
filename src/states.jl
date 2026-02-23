@@ -12,8 +12,17 @@ triplet_plus(f) = 1 / √2 * ((f[(1, 1), :↑]' * f[(1, 2), :↑]' + f[(1, 1), :
 triplet_minus(f) = 1 / √2 * ((f[(1, 1), :↑]' * f[(1, 2), :↑]' - f[(1, 1), :↓]' * f[(1, 2), :↓]'))
 
 function def_state(state_name, H, f)
-    v0 = vac_state(H)
-    v = matrix_representation(state_name(f), H) * v0
+    vac_ind = FermionicHilbertSpaces.state_index(FockNumber(0), H)
+    H2, v0 = if ismissing(vac_ind)
+        Haux = hilbert_space(keys(H), push!(copy(basisstates(H)), FockNumber(UInt(0))))
+        Haux, vac_state(Haux)
+    else
+        H, vac_state(H)
+    end
+    v = matrix_representation(state_name(f), H2; projection=true) * v0
+    if ismissing(vac_ind)
+        v = v[1:end-1]
+    end
     ρ = v * v'
     ρ = ρ / norm(ρ)
     return ρ
