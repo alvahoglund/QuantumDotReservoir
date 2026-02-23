@@ -12,8 +12,17 @@ triplet_plus(f) = 1 / √2 * ((f[(1, 1), :↑]' * f[(1, 2), :↑]' + f[(1, 1), :
 triplet_minus(f) = 1 / √2 * ((f[(1, 1), :↑]' * f[(1, 2), :↑]' - f[(1, 1), :↓]' * f[(1, 2), :↓]'))
 
 function def_state(state_name, H, f)
-    v0 = vac_state(H)
-    v = matrix_representation(state_name(f), H) * v0
+    vac_ind = FermionicHilbertSpaces.state_index(FockNumber(0), H)
+    H2, v0 = if ismissing(vac_ind)
+        Haux = hilbert_space(keys(H), push!(copy(basisstates(H)), FockNumber(UInt(0))))
+        Haux, vac_state(Haux)
+    else
+        H, vac_state(H)
+    end
+    v = matrix_representation(state_name(f), H2; projection=true) * v0
+    if ismissing(vac_ind)
+        v = v[1:end-1]
+    end
     ρ = v * v'
     ρ = ρ / norm(ρ)
     return ρ
@@ -66,26 +75,11 @@ end
 ## =============== Ground States ====================
 abstract type DiagonalizationAlg end
 struct ExactDiagonalizationAlg <: DiagonalizationAlg end
+
 function eig_state(hamiltonian::AbstractMatrix, n, ::ExactDiagonalizationAlg)
     eigenvalues, eigenvectors = eigen(Matrix(hamiltonian))
     eigenvectors[:, n]
 end
-
-ground_state(ham::AbstractMatrix{T}, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn::Int, alg=ExactDiagonalizationAlg()) where T = eig_state(ham, H, qn, 1, alg)
-
-function eig_state(ham::AbstractMatrix{T}, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn::Int, n, alg) where T
-    index_qn = FermionicHilbertSpaces.FermionicHilbertSpaces.indices(qn, H)
-    ham_qn = ham[index_qn, index_qn]
-    # state = spzeros(T, dim(H), dim(H))
-    state = spzeros(T, dim(H))
-    state[index_qn] = eig_state(ham_qn, n, alg)
-    return state
-end
-
-eig_state(ham::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn::Int, n, alg) =
-    eig_state(matrix_representation(ham, H), H, qn, n, alg)
-ground_state(ham::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H::FermionicHilbertSpaces.AbstractHilbertSpace, qn::Int, alg=ExactDiagonalizationAlg()) = ground_state(matrix_representation(ham, H), H, qn, alg)
-
 
 using ArnoldiMethod
 struct ArnoldiAlg <: DiagonalizationAlg end
@@ -102,5 +96,6 @@ function eig_state(m::AbstractMatrix, n, ::ArnoldiAlg; kwargs...)
     eigen[2][:, n]
     # vals, vecs
 end
-ground_state(symham, H, alg::ArnoldiAlg) = eig_state(matrix_representation(symham, H), 1, alg)
 
+ground_state(symham ::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H_qn, alg = ArnoldiAlg()) = eig_state(symham, H_qn, 1, alg)
+eig_state(sysham ::FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, H_qn, n, alg = ArnoldiAlg()) = eig_state(matrix_representation(sysham, H_qn), n, alg)

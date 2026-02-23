@@ -1,27 +1,32 @@
-function effective_measurement(op, ρ_reservoir, H_main_qn, H_reservoir, H_total)
-    H_main = hilbert_space(keys(H_main_qn), NumberConservation()) 
-    # Is this the best way to extend the Hilbert space? 
-    #Could also input the total main Hilbert space and run sector(qn, H) to get the subsystem, but then I loose the option of having ssub H_main with one particle in each dot.
+struct ExtendedResState{T} ρ::T end
 
-    ρ_reservoir_tot = embed(ρ_reservoir, H_reservoir => H_total; complement = H_main)
-    op_rho = partial_trace(op*ρ_reservoir_tot, H_total => H_main; complement = H_reservoir, alg = FermionicHilbertSpaces.FullPartialTraceAlg())
-    exp_value(ρ_m) = dot(ρ_m', op_rho)
- 
-    function func(ρ_main_qn_vec)
-        ρ_main_qn = reshape(ρ_main_qn_vec, dim(H_main_qn), dim(H_main_qn))
-        
-        #Pad matrix
-        ρ_main = zeros(Complex{Float64}, dim(H_main), dim(H_main))
-        index = FermionicHilbertSpaces.indices(H_main_qn, H_main)
-        ρ_main[index, index] = ρ_main_qn
-        
-        return exp_value(ρ_main)
-    end
+effective_measurement(op_qn, Ψ_res :: AbstractArray, qd_system) = 
+    effective_measurement(op_qn, extend_res_state(Ψ_res, qd_system), qd_system)
 
-    lmap = LinearMaps.LinearMap(func, 1, dim(H_main_qn)^2)
-    n_eff = reshape(Matrix{Complex{Float64}}(lmap)', dim(H_main_qn),  dim(H_main_qn))
-    return n_eff
+function effective_measurement(op_qn, ρ_reservoir_tot ::ExtendedResState, qd_system)
+    ind = indices(qd_system.H_total_qn, qd_system.H_total)
+    ρ_reservoir_tot_qn = ρ_reservoir_tot.ρ[ind, ind]
+    op_rho_qn = ρ_reservoir_tot_qn*op_qn
+
+    op_rho = spzeros(Complex{Float64}, dim(qd_system.H_total), dim(qd_system.H_total))
+    op_rho[ind, ind] = op_rho_qn
+
+    op_rho_tr = partial_trace(op_rho, qd_system.H_total => qd_system.H_main; complement = qd_system.H_reservoir, alg = FermionicHilbertSpaces.FullPartialTraceAlg())
+    ind = FermionicHilbertSpaces.indices(qd_system.H_main_qn, qd_system.H_main)
+    return op_rho_tr[ind, ind]
 end
 
-effective_measurement(op, ρ_reservoir, qd_system ::QuantumDotSystem) = 
-    effective_measurement(op, ρ_reservoir, qd_system.H_main_qn, qd_system.H_reservoir,qd_system.H_total)
+
+function extend_res_state(ψ_res_qn, qd_system)
+    ρ_res_qn = if ψ_res_qn isa AbstractVector
+        ψ_res_qn * ψ_res_qn'
+    else
+        ψ_res_qn
+    end
+
+    ind_res = indices(qd_system.H_reservoir_qn, qd_system.H_reservoir)
+    ρ_reservoir = spzeros(Complex{Float64}, dim(qd_system.H_reservoir), dim(qd_system.H_reservoir))
+    ρ_reservoir[ind_res, ind_res] = ρ_res_qn
+    ρ_reservoir_tot = embed(ρ_reservoir, qd_system.H_reservoir => qd_system.H_total; complement = qd_system.H_main)
+    return ExtendedResState(ρ_reservoir_tot)
+end
