@@ -1,10 +1,8 @@
 abstract type AbstractPropagatorAlg end
-struct FullPropagatorAlg <: AbstractPropagatorAlg end
 struct BlockPropagatorAlg <: AbstractPropagatorAlg end
 
 function scrambling_map(qd_system, measurements :: AbstractArray{<:AbstractMatrix}, ρ_reservoir_tot ::ExtendedResState, 
     hamiltonian_total_qn :: AbstractMatrix, t, ::BlockPropagatorAlg)
-    # The scrambling map for measurements at time t
     prop = propagator(t, hamiltonian_total_qn)
     process_measurements = op -> effective_measurement(
         operator_time_evolution(prop, op), ρ_reservoir_tot, qd_system
@@ -14,7 +12,7 @@ function scrambling_map(qd_system, measurements :: AbstractArray{<:AbstractMatri
     return scrambling_map
 end
 
-function scrambling_map(qd_system, measurements, Ψ_res, 
+function scrambling_map(qd_system, measurements  :: AbstractArray{<:FermionicHilbertSpaces.NonCommutativeProducts.NCAdd}, Ψ_res, 
     hamiltonian_total :: FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, t_list, alg::BlockPropagatorAlg)
     ρ_res = if Ψ_res isa AbstractVector
         Ψ_res * Ψ_res'
@@ -24,7 +22,6 @@ function scrambling_map(qd_system, measurements, Ψ_res,
     if isa(t_list, Number)
         t_list = [t_list]
     end
-    
     measurements_m = map(m -> Diagonal(diag(matrix_representation(m ,qd_system.H_total_qn))), measurements)
     hamiltonian_total_qn = matrix_representation(hamiltonian_total, qd_system.H_total_qn)
 
@@ -39,7 +36,19 @@ struct PureStatePropagatorAlg <: AbstractPropagatorAlg
     tol::Float64
 end
 PureStatePropagatorAlg(; krylov_dim=200, tol=1e-6) = PureStatePropagatorAlg(krylov_dim, tol)
-function scrambling_map(sys::QuantumDotSystem, measurements, ψres::AbstractVector, hamiltonian, t, alg::PureStatePropagatorAlg)
+
+function scrambling_map(qd_system, measurements:: AbstractArray{<:FermionicHilbertSpaces.NonCommutativeProducts.NCAdd}, Ψ_res :: AbstractVector, 
+    hamiltonian_total :: FermionicHilbertSpaces.NonCommutativeProducts.NCAdd, t_list, alg::PureStatePropagatorAlg)
+    if isa(t_list, Number)
+        t_list = [t_list]
+    end
+    measurements_m = map(m -> Diagonal(diag(matrix_representation(m ,qd_system.H_total_qn))), measurements)
+    hamiltonian_total_qn = matrix_representation(hamiltonian_total, qd_system.H_total_qn)
+    scrambling_maps = [scrambling_map(qd_system, measurements_m, Ψ_res, hamiltonian_total_qn, t, alg) for t in t_list]
+    return vcat(scrambling_maps...)
+end
+
+function scrambling_map(sys::QuantumDotSystem, measurements :: AbstractArray{<:AbstractMatrix}, ψres::AbstractVector, hamiltonian ::AbstractMatrix, t, alg::PureStatePropagatorAlg)
     iH = -im .* hamiltonian
     N = dim(sys.H_total_qn) 
     N_main = dim(sys.H_main_qn)
@@ -49,7 +58,7 @@ function scrambling_map(sys::QuantumDotSystem, measurements, ψres::AbstractVect
     U = stack(1:N_main) do n
         fill!(e_j, 0)
         e_j[n] = 1.0
-        ψtot = generalized_kron((e_j, ψres), (sys.H_main_qn, sys.H_reservoir_qn) => sys.H_total_qn) ## This might not work now? As I removed H_main_qn
+        ψtot = generalized_kron((e_j, ψres), (sys.H_main_qn, sys.H_reservoir_qn) => sys.H_total_qn)
         arnoldi!(Ks, iH, ψtot; tol=alg.tol)
         expv(t, Ks)
     end
